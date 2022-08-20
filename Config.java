@@ -44,8 +44,8 @@ public interface Config {
         EXERCISE,
         REPORT,
         BADGE,
-        SET,
-        QR
+        SET
+        // QR
     }
 
     public enum ReportType {
