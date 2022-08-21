@@ -1,6 +1,7 @@
+import java.util.HashMap;
 import java.util.UUID;
 
-public class UniqueID implements Config {
+public class UniqueID implements Config, Saveable {
     private String uniqueID;
     private IDType type;
     private User user;
@@ -9,9 +10,36 @@ public class UniqueID implements Config {
     private Set set; // not in class diagram
     private Report report;
     private Badge badge;
+    private static HashMap<UniqueID, User> userMap = new HashMap<UniqueID, User>();
+    private static HashMap<UniqueID, Object> linkedObjectMap = new HashMap<UniqueID, Object>();
 
     // todo how are we assigning these?
-    
+    public UniqueID(){
+        System.out.println("Error: UniqueID constructor called without parameters");
+    }
+
+    public UniqueID(IDType type, User user) {
+        // TODO should this only be called for a new user?
+        if (type == IDType.USER) {
+            this.uniqueID = UUID.randomUUID().toString();
+            userMap.put(this, user);
+            this.type = type;
+            this.user = user;
+        } else {
+            System.out.println("Error: Attempting to create a User UniqueID that is not of type user");
+        }
+    }
+
+    public UniqueID(IDType type, User user, Object object) {
+        // TODO should there always be a user?
+        this.type = type; // Set type to the parameter type
+        this.user = user; // Set user to the parameter user
+        userMap.put(this, user); // Add this UniqueID to the user map
+        this.generateUUID(); // Generate a UUID for this UniqueID
+        this.assignObject(type, object);
+        linkedObjectMap.put(this, object);
+    }
+
     //getters
     public String getUniqueID() {
         return uniqueID;
@@ -20,6 +48,28 @@ public class UniqueID implements Config {
     public IDType getType() {
         return type;
     }
+
+    public static User getUserFromMap(UniqueID uniqueID) {
+        // check if the user exists in the map
+        if (userMap.containsKey(uniqueID)) {
+            return userMap.get(uniqueID);
+        } else {
+            System.out.println("Error: User does not exist in the map");
+            return null;
+        }
+    }
+
+    public static Object getObjectFromMap(UniqueID uniqueID) {
+        // check if the object exists in the map
+        if (linkedObjectMap.containsKey(uniqueID)) {
+            return linkedObjectMap.get(uniqueID);
+        } else {
+            System.out.println("Error: Object does not exist in the map");
+            return null;
+        }
+    }
+    
+    // Use getLinked() to get the linked object
 
     //setters
     public void setWorkout(Workout workout) {
@@ -61,53 +111,38 @@ public class UniqueID implements Config {
             System.out.println("Error: Attempting to assign a badge to a UniqueID that is not a badge");
         }
     }
-    public UniqueID(){
-        
+
+    private void assignObject(IDType type, Object object) {
+        if (type == IDType.WORKOUT) {
+            this.workout = (Workout) object;
+            return;
+        }
+        if (type == IDType.EXERCISE) {
+            this.exercise = (Exercise) object;
+            return;
+        }
+        if (type == IDType.SET) {
+            this.set = (Set) object;
+            return;
+        }
+        if (type == IDType.REPORT) {
+            this.report = (Report) object;
+            return;
+        }
+        if (type == IDType.BADGE) {
+            this.badge = (Badge) object;
+            return;
+        }
+        System.out.println("Error: Attempting to assign an object to a UniqueID of unknown type");
+
     }
 
-    public UniqueID(IDType type, User user) {
-        // TODO should there always be a user?
-        this.type = type; // Set type to the parameter type
-        this.user = user; // Set user to the parameter user
-        this.generateUUID(); // Generate a UUID for this UniqueID   
-    }
-
-    public UniqueID(IDType type, User user, Object object) {
-        // TODO should there always be a user?
-        this.type = type; // Set type to the parameter type
-        this.user = user; // Set user to the parameter user
-        this.generateUUID(); // Generate a UUID for this UniqueID   
-    }
     private void generateUUID() {
         if (this.uniqueID == null) {
             this.uniqueID = UUID.randomUUID().toString();
         } else {
             System.out.println("UniqueID already exists");
         }
-    }
-
-    private void newUser() {
-         // TODO
-    }
-
-    private void newWorkout() {
-        // TODO
-    }
-
-    private void newExercise() {
-        // TODO
-    }
-
-    private void newSet() {
-        // TODO
-    }
-
-    private void newReport() {
-        // TODO
-    }
-
-    private void newBadge() {
-        // TODO
     }
 
     public static User getUserByID(UniqueID uniqueID) {
@@ -135,5 +170,11 @@ public class UniqueID implements Config {
         }
 
         return null;
+    }
+
+    @Override
+    public void save() {
+        // TODO Auto-generated method stub
+        
     }
 }  
