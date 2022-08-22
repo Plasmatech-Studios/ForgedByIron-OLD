@@ -3,23 +3,39 @@ import java.io.FileWriter;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Date;
 import java.util.HashMap;
 
 public class SecurityManager implements Config {
 
     private static HashMap<String, UniqueID> usernameMap = new HashMap<String, UniqueID>();
     private static HashMap<UniqueID, String> passwordMap = new HashMap<UniqueID, String>();
-    public static void main(String args[])  throws NoSuchAlgorithmException{
-        createUser("Peter", "password");
-        System.out.println("Created user Peter with password password");
-        User testLogin = login("Peter", "password");
-        System.out.println("Logged in user Peter with password password");
+    public static void main(String args[])  throws NoSuchAlgorithmException {
+        Date date = new Date(System.currentTimeMillis());
+        String username = "admin";
+        String password = "password";
+        createUser(username, password);
+        System.out.println("Created user " + username + " with password " + password);
+        User testLogin = login(username, (password));
         if (testLogin == null) {
             System.out.println("Error: Login failed");
+            return;
         } else {
-            System.out.println("Success: Login succeeded");
+            System.out.println("Logged in as " + testLogin.username);
+
         }
-        saveUserData();
+
+        testLogin.createWorkout();
+        testLogin.getCurrentWorkout().addExercise();
+        testLogin.getCurrentWorkout().exercises.get(0).addSet(SetType.WEIGHT, 100.0f, 5);
+        testLogin.getCurrentWorkout().exercises.get(0).addSet(SetType.WEIGHT, 100.0f, 5);
+        testLogin.getCurrentWorkout().exercises.get(0).addSet(SetType.WEIGHT, 100.0f, 5);
+        testLogin.completeWorkout();
+        Date date2 = new Date(System.currentTimeMillis());
+        System.out.println("Workout started at " + date.getTime() + " and completed at " + date2.getTime());
+        System.out.println("Workout duration: " + (date2.getTime() - date.getTime()) + " milliseconds");
+        //testLogin.workoutHistory.get(0).exercises.get(0).sets.get(0).setWeight(100.0f);
+        //saveUserData();
     }
 
     public static User createUser(String username, String password) throws NoSuchAlgorithmException {
@@ -28,6 +44,8 @@ public class SecurityManager implements Config {
             return null;
         }
         String hashedPassword = hashString(password);
+        //User user = new User(username, hashedPassword);
+        //User.mainUser = user;
         User.mainUser = new User(username, hashedPassword);
         UniqueID userID = User.mainUser.userID;
         usernameMap.put(username, userID);
@@ -46,7 +64,7 @@ public class SecurityManager implements Config {
             System.out.println("Error: Password is incorrect");
             return null;
         }
-        User.mainUser = new User(userID);
+        User.mainUser = new User(username, userID, hashedPassword);
         User.secretKey = hashedPassword;
         return User.mainUser;
     }
@@ -96,29 +114,6 @@ public class SecurityManager implements Config {
             writer.write(User.mainUser.userID.getUniqueID()+ "\n");
             writer.write((UniqueID.getUserFromMap(User.mainUser.userID)).username + "\n");
             writer.write(User.secretKey + "\n");
-            // writer.write(User.mainUser.summary.toString() + "\n");
-            // writer.write(User.mainUser.goal.toString() + "\n");
-            // writer.write(User.mainUser.profilePicture + "\n");
-            // writer.write(User.mainUser.workoutHistory.size() + "\n");
-            // for (Workout workout : User.mainUser.workoutHistory) {
-            //     writer.write(workout.toString() + "\n");
-            // }
-            // writer.write(User.mainUser.badges.size() + "\n");
-            // for (Badge badge : User.mainUser.badges) {
-            //     writer.write(badge.toString() + "\n");
-            // }
-            // writer.write(User.mainUser.followers.size() + "\n");
-            // for (UniqueID follower : User.mainUser.followers) {
-            //     writer.write(follower.toString() + "\n");
-            // }
-            // writer.write(User.mainUser.following.size() + "\n");
-            // for (UniqueID following : User.mainUser.following) {
-            //     writer.write(following.toString() + "\n");
-            // }
-            // writer.write(User.mainUser.summaryHistory.size() + "\n");
-            // for (Summary summary : User.mainUser.summaryHistory) {
-            //     writer.write(summary.toString() + "\n");
-            // }
             writer.close();
         } catch (Exception e) {
             System.out.println("Error: Could not write to userData.txt");

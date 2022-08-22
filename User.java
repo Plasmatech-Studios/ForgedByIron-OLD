@@ -19,6 +19,7 @@ public class User implements Config, Saveable {
 
     public User(UniqueID userID) { // Constructor of a User object, not creating a new user in the System
         this.userID = userID;
+        System.out.println("I should not be here");
     }
 
     /**
@@ -32,19 +33,68 @@ public class User implements Config, Saveable {
         this.username = username;
         User.secretKey = secretKey;
         User.mainUser = this;
+        System.out.println("New user created: " + username);
+    }
+
+    public User(String username, UniqueID userID, String secretKey) { // constructor for login new users - should only be called by SecurityManager
+        this.userID = userID;
+        this.username = username;
+        User.secretKey = secretKey;
+        User.mainUser = this;
+        System.out.println("New user created: " + username);
     }
 
     public Workout createWorkout() {
         if (this.currenWorkout == null) {
             this.currenWorkout = new Workout(this.userID);
+            System.out.println("Workout created");
         } else {
             System.out.println("Error: User already has a workout");
         }
         return this.currenWorkout;
     }
 
+    public Workout importWorkout(Workout workout) {
+        if (this.currenWorkout == null) {
+            this.currenWorkout = workout;
+        } else {
+            System.out.println("Error: User already has a workout");
+            // This could be added to a list of workouts to be imported later
+        }
+        return this.currenWorkout;
+    }
+
+    public Workout completeWorkout() {
+        if (this.currenWorkout != null) {
+            if (this.currenWorkout.completeWorkout()) {
+                if (this.currenWorkout.exercises.size() > 0) {
+                    this.workoutHistory.add(this.currenWorkout);
+                    this.currenWorkout = null;
+                    System.out.println("Workout completed");
+                } else {
+                    System.out.println("Error: Completed Workout has no exercises");
+                    this.currenWorkout = null;
+                }
+            } else {
+                System.out.println("Error: Workout could not be completed");
+                return null;
+            }
+        } else {
+            System.out.println("Error: User does not have a workout");
+            return null;
+        }
+        if (this.workoutHistory.size() > 0) {
+            return this.workoutHistory.get(this.workoutHistory.size() - 1);
+        }
+        return null;
+    }
+
     public UniqueID getID() {
         return this.userID;
+    }
+
+    public Workout getCurrentWorkout() {
+        return this.currenWorkout;
     }
 
     @Override
