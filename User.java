@@ -17,17 +17,12 @@ public class User implements Config, Saveable {
 
     public Workout currenWorkout;
 
-    public User(UniqueID userID) { // Constructor of a User object, not creating a new user in the System
+    // Constructor for creating a new user from the database
+    public User(UniqueID userID) { 
         this.userID = userID;
-        System.out.println("I should not be here");
+        System.out.println("I should only be called if loading from the DB");
     }
 
-    /**
-     * Constructor for creating a new user
-     * 
-     * @param username
-     * @param password
-     */
     public User(String username, String secretKey) { // constructor for creating new users - should only be called by SecurityManager
         this.userID = new UniqueID(IDType.USER, this);
         this.username = username;
@@ -44,6 +39,10 @@ public class User implements Config, Saveable {
         System.out.println("New user created: " + username);
     }
 
+    public void getUserValuesFromDB() { 
+        // TODO get user values from the database
+    }
+
     public Workout createWorkout() {
         if (this.currenWorkout == null) {
             this.currenWorkout = new Workout(this.userID);
@@ -54,7 +53,42 @@ public class User implements Config, Saveable {
         return this.currenWorkout;
     }
 
-    public Workout importWorkout(Workout workout) {
+    public void importWorkoutFromDB(Workout workout) {
+        this.workoutHistory.add(workout);
+        // this data needs to be added correctly
+    }
+
+    public void importSummaryFromDB(Summary summary) {
+        this.summaryHistory.add(summary);
+    }
+
+    public void importBadgeFromDB(Badge badge) {
+        this.badges.add(badge);
+    }
+
+    public void importGoalFromDB(Goal goal) {
+        this.goal = goal;
+    }
+
+    public void importProfilePictureFromDB(String profilePicture) {
+        this.profilePicture = profilePicture;
+    }
+
+    public void importFollowersFromDB(UniqueID follower) {
+        this.followers.add(follower);
+    }
+
+    public void importFollowingFromDB(UniqueID following) {
+        this.following.add(following);
+    }
+
+    // public void importWorkoutHistoryFromDB(ArrayList<Workout> workoutHistory) {
+    //     for (Workout workout : workoutHistory) {
+    //         this.workoutHistory.add(workout);
+    //     }
+    // }
+
+    public Workout importWorkoutToCurrent(Workout workout) {
         if (this.currenWorkout == null) {
             this.currenWorkout = workout;
         } else {

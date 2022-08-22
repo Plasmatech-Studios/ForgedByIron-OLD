@@ -46,7 +46,14 @@ public class Set implements Config, Saveable {
     public Set(UniqueID exerciseID, UniqueID setID) {
         this.exerciseID = exerciseID;
         this.setID = setID;
+        exercise = (Exercise)UniqueID.getLinked(exerciseID);
+        exercise.importSetFromDB(this);
+        this.getSetValuesFromDB();
         // TODO - Some function to put in a queue to populate
+    }
+
+    public void getSetValuesFromDB() {
+        // TODO - Get values from DB
     }
 
 

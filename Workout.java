@@ -3,7 +3,7 @@ import java.sql.Date;
 
 public class Workout implements Config, Saveable {
     public UniqueID userID;
-    public User user;
+    private User user; // Use getUser()
     public UniqueID workoutID;
     public ArrayList<Exercise> exercises = new ArrayList<Exercise>();
     public ActivityState state;
@@ -34,7 +34,14 @@ public class Workout implements Config, Saveable {
     public Workout(UniqueID userID, UniqueID workoutID) {
         this.workoutID = workoutID;
         this.userID = userID;
+        this.user = UniqueID.getUserByID(userID);
+        this.user.importWorkoutFromDB(this);
+        this.getWorkoutValuesFromDB();
         // TODO - Some function to put in a queue to populate
+    }
+
+    public void getWorkoutValuesFromDB() {
+        // TODO - Get values from DB
     }
 
     public UniqueID getID() {
@@ -84,7 +91,10 @@ public class Workout implements Config, Saveable {
     }
 
     public User getUser() {
-        return UniqueID.getUserByID(this.userID);
+        if (this.user == null) {
+            this.user = UniqueID.getUserByID(this.userID);
+        }
+        return this.user;
     }
 
     @Override
@@ -164,6 +174,10 @@ public class Workout implements Config, Saveable {
 
     public long getWorkoutDurationMinutes() {
         return this.totalTime.getTime() / 1000 / 60;
+    }
+
+    public void importExerciseFromDB(Exercise exercise) {
+        this.exercises.add(exercise);
     }
 
 }

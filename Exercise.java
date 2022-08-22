@@ -38,13 +38,24 @@ public class Exercise implements Config, Saveable {
         this.createdByID = workout.getUser().getID();
     }
 
-        // Constructor for loading in data
-        public Exercise(UniqueID createdByID, UniqueID workoutID, UniqueID exerciseID) {
-            this.workoutID = workoutID;
-            this.createdByID = createdByID;
-            this.exerciseID = exerciseID;
-            // TODO - Some function to put in a queue to populate
-        }
+    // Constructor for loading in data
+    public Exercise(UniqueID createdByID, UniqueID workoutID, UniqueID exerciseID) {
+        this.workoutID = workoutID;
+        this.createdByID = createdByID;
+        this.exerciseID = exerciseID;
+        workout = (Workout)UniqueID.getLinked(workoutID);
+        workout.importExerciseFromDB(this);
+        this.getExerciseValuesFromDB();
+        // TODO - Some function to put in a queue to populate
+    }
+
+    public void getExerciseValuesFromDB() {
+        // TODO - Get values from DB
+    }
+
+    public void importSetFromDB(Set set) {
+        sets.add(set);
+    }
 
     public UniqueID getID() {
         return this.exerciseID;
