@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -10,12 +11,29 @@ public class UniqueID implements Config, Saveable {
     private Set set; // not in class diagram
     private Report report;
     private Badge badge;
+    private static HashMap<String, UniqueID> allUniqueIDsByID = new HashMap<String, UniqueID>();
     private static HashMap<UniqueID, User> userMap = new HashMap<UniqueID, User>();
     private static HashMap<UniqueID, Object> linkedObjectMap = new HashMap<UniqueID, Object>();
 
     // todo how are we assigning these?
     public UniqueID(){
         System.out.println("Error: UniqueID constructor called without parameters");
+    }
+
+    // Used to load data from the database
+    public UniqueID(String uniqueID, IDType type){
+        this.uniqueID = uniqueID;
+        this.type = type;
+        if (allUniqueIDsByID.containsKey(uniqueID)){
+            System.out.println("Error: UniqueID constructor called with duplicate uniqueID");
+        } else {
+            allUniqueIDsByID.put(uniqueID, this);
+            // if (type == IDType.USER) { // this should be handled separately
+            //     createLinkedUser(this);
+            // } else {
+            //     createLinkedObject(this); // can't do this until all loaded
+            // }
+        }
     }
 
     public UniqueID(IDType type, User user) {

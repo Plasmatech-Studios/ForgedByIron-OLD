@@ -1,3 +1,5 @@
+import java.sql.Date;
+
 public class Set implements Config, Saveable {
     public UniqueID exerciseID;
     public Exercise exercise;
@@ -9,7 +11,12 @@ public class Set implements Config, Saveable {
     public SetType setType;
     public ActivityState state;
 
+    public Date timeStarted;
+    public Date timeCompleted;
+    public Date totalTime;
+
     public Set(Exercise exercise, SetType setType) {
+        this.timeStarted = new Date(System.currentTimeMillis());
         this.exercise = exercise;
         this.exerciseID = exercise.getID();
         this.setID = new UniqueID(IDType.SET, exercise.workout.getUser(), this);
@@ -18,7 +25,7 @@ public class Set implements Config, Saveable {
     }
 
     public Set(Exercise exercise, SetType type, float weightTime, int reps) {
-
+        this.timeStarted = new Date(System.currentTimeMillis());
         this.exercise = exercise;
         this.exerciseID = exercise.getID();
         this.setID = new UniqueID(IDType.SET, exercise.workout.getUser(), this);
@@ -33,6 +40,13 @@ public class Set implements Config, Saveable {
             this.timeSeconds = weightTime;
             this.weight = 0;
         }
+    }
+
+    // Constructor for loading in data
+    public Set(UniqueID exerciseID, UniqueID setID) {
+        this.exerciseID = exerciseID;
+        this.setID = setID;
+        // TODO - Some function to put in a queue to populate
     }
 
 
@@ -65,6 +79,8 @@ public class Set implements Config, Saveable {
     }
 
     public void completeSet() {
+        this.timeCompleted = new Date(System.currentTimeMillis());
+        this.totalTime = new Date(this.timeCompleted.getTime() - this.timeStarted.getTime());
         this.state = ActivityState.COMPLETED;
     }
 

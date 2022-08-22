@@ -1,3 +1,4 @@
+import java.sql.Date;
 import java.util.ArrayList;
 
 import org.w3c.dom.events.Event;
@@ -15,7 +16,12 @@ public class Exercise implements Config, Saveable {
     public ArrayList<Event> events = new ArrayList<Event>();
     public ArrayList<Set> sets = new ArrayList<Set>();
 
+    public Date timeStarted;
+    public Date timeCompleted;
+    public Date totalTime;
+
     public Exercise(Workout workout) {
+        this.timeStarted = new Date(System.currentTimeMillis());
         this.workout = workout;
         this.workoutID = workout.workoutID;
         this.exerciseID = new UniqueID(IDType.EXERCISE, workout.getUser(), this);
@@ -24,12 +30,21 @@ public class Exercise implements Config, Saveable {
     }
 
     public Exercise(UniqueID workoutID) {
+        this.timeStarted = new Date(System.currentTimeMillis());
         this.workoutID = workoutID;
         this.workout = (Workout)UniqueID.getLinked(this.workoutID);
         this.exerciseID = new UniqueID(IDType.EXERCISE, workout.getUser(), this);
         this.state = ActivityState.NOT_STARTED;
         this.createdByID = workout.getUser().getID();
     }
+
+        // Constructor for loading in data
+        public Exercise(UniqueID createdByID, UniqueID workoutID, UniqueID exerciseID) {
+            this.workoutID = workoutID;
+            this.createdByID = createdByID;
+            this.exerciseID = exerciseID;
+            // TODO - Some function to put in a queue to populate
+        }
 
     public UniqueID getID() {
         return this.exerciseID;
@@ -64,12 +79,23 @@ public class Exercise implements Config, Saveable {
         return this.sets.get(this.sets.size() - 1);
     }
 
-    public void completeSets() {
+    public void completeSet(Set set) {
+        if (this.state == ActivityState.COMPLETED) {
+            this.state = ActivityState.IN_PROGRESS; // TODO - may need to flag as modified
+        }
+        if (this.state == ActivityState.NOT_STARTED) {
+            this.state = ActivityState.IN_PROGRESS;
+        }
+        set.completeSet();
+        System.out.println("Set of type: " + set.setType + " completed");
+    }
+
+    public void completeAllSets() {
         if (this.state == ActivityState.IN_PROGRESS) {
             for (Set set : this.sets) {
-                set.state = ActivityState.COMPLETED;
+                set.completeSet();
+                System.out.println("Set of type: " + set.setType + " completed");
             }
-            this.state = ActivityState.COMPLETED;
         } else {
             System.out.println("Exercise not in progress");
         }
@@ -102,6 +128,9 @@ public class Exercise implements Config, Saveable {
             return false;
         }
         this.state = ActivityState.COMPLETED;
+        this.timeCompleted = new Date(System.currentTimeMillis());
+        this.totalTime = new Date(this.timeCompleted.getTime() - this.timeStarted.getTime());
+        System.out.println("Exercise completed in " + this.totalTime.getTime() + " milliseconds");
         return true;
     }
     
@@ -138,5 +167,14 @@ public class Exercise implements Config, Saveable {
             }
         }
                 
+    }
+
+    public boolean hasOutstandingSets() {
+        for (Set set : this.sets) {
+            if (set.state == ActivityState.IN_PROGRESS) {
+                return true;
+            }
+        }
+        return false;
     }
 }

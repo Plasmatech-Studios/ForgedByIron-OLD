@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.sql.Date;
 
 public class Workout implements Config, Saveable {
     public UniqueID userID;
@@ -7,8 +8,12 @@ public class Workout implements Config, Saveable {
     public ArrayList<Exercise> exercises = new ArrayList<Exercise>();
     public ActivityState state;
     public boolean modified;
+    public Date timeStarted;
+    public Date timeCompleted;
+    public Date totalTime;
 
     public Workout(UniqueID userID) {
+        this.timeStarted = new Date(System.currentTimeMillis());
         this.userID = userID;
         this.user = UniqueID.getUserByID(this.userID);
         this.workoutID = new UniqueID(IDType.WORKOUT, user, this);
@@ -17,11 +22,19 @@ public class Workout implements Config, Saveable {
     }
 
     public Workout(User user) {
+        this.timeStarted = new Date(System.currentTimeMillis());
         this.userID = user.getID();
         this.user = user;
         this.workoutID = new UniqueID(IDType.WORKOUT, user, this);
         this.state = ActivityState.NOT_STARTED;
         this.modified = false;
+    }
+
+    // Constructor for loading in data
+    public Workout(UniqueID userID, UniqueID workoutID) {
+        this.workoutID = workoutID;
+        this.userID = userID;
+        // TODO - Some function to put in a queue to populate
     }
 
     public UniqueID getID() {
@@ -89,20 +102,26 @@ public class Workout implements Config, Saveable {
             if (this.exercises.size() > 0) {
                 for (Exercise exercise : this.exercises) {
                     if (exercise.state != ActivityState.COMPLETED) {
-                        // remove exercise from workout
-                        
-                        deleteExercise(exercise); // deleting unfinished exercises before completing workout
-                        // TODO prompt user first?
-                        // iterate over the next exercise
+                        // if all sets in the exercise are completed, complete the exercise
+                        if (exercise.hasOutstandingSets()) {
+                            deleteExercise(exercise); // deleting unfinished exercises before completing workout
+                        } else {
+                            exercise.completeExercise();
+                        }
+
                         if (this.exercises.size() > 0) {
-                            continue;
+                            continue; // Check needed incase last exercise was removed
                         } else {
                             this.state = ActivityState.COMPLETED;
+                            this.timeCompleted = new Date(System.currentTimeMillis());
+                            this.totalTime = new Date(this.timeCompleted.getTime() - this.timeStarted.getTime());
                             return true;
                         }
                     }
                 }
                 this.state = ActivityState.COMPLETED;
+                this.timeCompleted = new Date(System.currentTimeMillis());
+                this.totalTime = new Date(this.timeCompleted.getTime() - this.timeStarted.getTime());
                 //this.modified = true;
                 return true;
             } else {
@@ -133,6 +152,18 @@ public class Workout implements Config, Saveable {
         } else {
             return false;
         }
+    }
+
+    public long getWorkoutDurationMillis() {
+        return this.totalTime.getTime();
+    }
+
+    public long getWorkoutDurationSeconds() {
+        return this.totalTime.getTime() / 1000;
+    }
+
+    public long getWorkoutDurationMinutes() {
+        return this.totalTime.getTime() / 1000 / 60;
     }
 
 }

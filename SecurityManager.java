@@ -11,7 +11,6 @@ public class SecurityManager implements Config {
     private static HashMap<String, UniqueID> usernameMap = new HashMap<String, UniqueID>();
     private static HashMap<UniqueID, String> passwordMap = new HashMap<UniqueID, String>();
     public static void main(String args[])  throws NoSuchAlgorithmException {
-        Date date = new Date(System.currentTimeMillis());
         String username = "admin";
         String password = "password";
         createUser(username, password);
@@ -24,16 +23,18 @@ public class SecurityManager implements Config {
             System.out.println("Logged in as " + testLogin.username);
 
         }
-
+        Date date = new Date(System.currentTimeMillis());
         testLogin.createWorkout();
         testLogin.getCurrentWorkout().addExercise();
         testLogin.getCurrentWorkout().exercises.get(0).addSet(SetType.WEIGHT, 100.0f, 5);
         testLogin.getCurrentWorkout().exercises.get(0).addSet(SetType.WEIGHT, 100.0f, 5);
         testLogin.getCurrentWorkout().exercises.get(0).addSet(SetType.WEIGHT, 100.0f, 5);
+        testLogin.getCurrentWorkout().exercises.get(0).completeAllSets();
         testLogin.completeWorkout();
         Date date2 = new Date(System.currentTimeMillis());
         System.out.println("Workout started at " + date.getTime() + " and completed at " + date2.getTime());
         System.out.println("Workout duration: " + (date2.getTime() - date.getTime()) + " milliseconds");
+        System.out.println("Workout duration: " + testLogin.workoutHistory.get(0).getWorkoutDurationMillis() + " milliseconds");
         //testLogin.workoutHistory.get(0).exercises.get(0).sets.get(0).setWeight(100.0f);
         //saveUserData();
     }
