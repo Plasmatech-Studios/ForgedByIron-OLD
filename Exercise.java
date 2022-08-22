@@ -6,7 +6,7 @@ import org.w3c.dom.events.Event;
 public class Exercise implements Config, Saveable {
     public UniqueID createdByID;
     public UniqueID workoutID;
-    public Workout workout;
+    //public Workout workout;
     public UniqueID exerciseID;
     public String exerciseName;
     public ExerciseCatagory exerciseCatagory;
@@ -14,25 +14,16 @@ public class Exercise implements Config, Saveable {
     public ActivityState state;
     public String exerciseDescription; // not on class diagram
     public ArrayList<Event> events = new ArrayList<Event>();
-    public ArrayList<Set> sets = new ArrayList<Set>();
+    public ArrayList<UniqueID> sets = new ArrayList<UniqueID>();
 
     public Date timeStarted;
     public Date timeCompleted;
     public Date totalTime;
 
-    public Exercise(Workout workout) {
-        this.timeStarted = new Date(System.currentTimeMillis());
-        this.workout = workout;
-        this.workoutID = workout.workoutID;
-        this.exerciseID = new UniqueID(IDType.EXERCISE, workout.getUser(), this);
-        this.state = ActivityState.NOT_STARTED;
-        this.createdByID = workout.getUser().getID();
-    }
-
     public Exercise(UniqueID workoutID) {
         this.timeStarted = new Date(System.currentTimeMillis());
         this.workoutID = workoutID;
-        this.workout = (Workout)UniqueID.getLinked(this.workoutID);
+        Workout workout = (Workout)UniqueID.getLinked(this.workoutID);
         this.exerciseID = new UniqueID(IDType.EXERCISE, workout.getUser(), this);
         this.state = ActivityState.NOT_STARTED;
         this.createdByID = workout.getUser().getID();
@@ -43,8 +34,8 @@ public class Exercise implements Config, Saveable {
         this.workoutID = workoutID;
         this.createdByID = createdByID;
         this.exerciseID = exerciseID;
-        workout = (Workout)UniqueID.getLinked(workoutID);
-        workout.importExerciseFromDB(this);
+        Workout workout = (Workout)UniqueID.getLinked(workoutID);
+        workout.importExerciseFromDB(this.exerciseID);
         this.getExerciseValuesFromDB();
         // TODO - Some function to put in a queue to populate
     }
@@ -54,14 +45,19 @@ public class Exercise implements Config, Saveable {
     }
 
     public void importSetFromDB(Set set) {
-        sets.add(set);
+        sets.add(set.setID);
     }
 
     public UniqueID getID() {
         return this.exerciseID;
     }
 
-    public Set addSet(SetType setType) {
+    public Set getSet(UniqueID setID) {
+        return (Set)UniqueID.getLinked(setID);
+
+    }
+
+    public UniqueID addSet(SetType setType) {
         if (this.state == ActivityState.COMPLETED) {
             // Send message to ensure user knows workout is completed - this will flag as modified
             // TODO - Check if workout is completed and if so, unlock (inside workout)
@@ -71,11 +67,11 @@ public class Exercise implements Config, Saveable {
         if (this.state == ActivityState.NOT_STARTED) {
             this.state = ActivityState.IN_PROGRESS;
         }
-        this.sets.add(new Set(this, setType));
+        this.sets.add(new Set(this.exerciseID, setType).setID);
         return this.sets.get(this.sets.size() - 1);
     }
 
-    public Set addSet(SetType type, float weight, int reps) {
+    public UniqueID addSet(SetType type, float weight, int reps) {
         if (this.state == ActivityState.COMPLETED) {
             // Send message to ensure user knows workout is completed - this will flag as modified
             // TODO - Check if workout is completed and if so, unlock (inside workout)
@@ -85,7 +81,7 @@ public class Exercise implements Config, Saveable {
         if (this.state == ActivityState.NOT_STARTED) {
             this.state = ActivityState.IN_PROGRESS;
         }
-        this.sets.add(new Set(this, type, weight, reps));
+        this.sets.add(new Set(this.exerciseID, type, weight, reps).setID);
         System.out.println("Empty Set of type: " + type + " added to Exercise");
         return this.sets.get(this.sets.size() - 1);
     }
@@ -103,7 +99,8 @@ public class Exercise implements Config, Saveable {
 
     public void completeAllSets() {
         if (this.state == ActivityState.IN_PROGRESS) {
-            for (Set set : this.sets) {
+            for (UniqueID setID : this.sets) {
+                Set set = (Set)UniqueID.getLinked(setID);
                 set.completeSet();
                 System.out.println("Set of type: " + set.setType + " completed");
             }
@@ -117,7 +114,8 @@ public class Exercise implements Config, Saveable {
         if (this.state == ActivityState.IN_PROGRESS) { // if exercise is in progress, check if all sets are completed
             // if exercise contains unfinshed sets, remove them
             for (int i = 0; i < this.sets.size(); i++) {
-                if (this.sets.get(i).state == ActivityState.IN_PROGRESS) {
+                Set set = (Set)UniqueID.getLinked(this.sets.get(i));
+                if (set.state == ActivityState.IN_PROGRESS) {
                     // TODO prompt the user
                     this.sets.remove(i);
                     i--; // TODO is this correct?
@@ -126,7 +124,7 @@ public class Exercise implements Config, Saveable {
             }
             // if exercise contains no sets, delete exercise
             if (this.sets.size() == 0) {
-                this.workout.deleteExercise(this);
+                this.getWorkout().deleteExercise(this.exerciseID);
                 return false;
             }
         }
@@ -146,7 +144,7 @@ public class Exercise implements Config, Saveable {
     }
     
 
-    public Set addSetWithValues(SetType type, float weight, int reps) {
+    public UniqueID addSetWithValues(SetType type, float weight, int reps) {
         if (this.state == ActivityState.COMPLETED) {
             // Send message to ensure user knows workout is completed - this will flag as modified
             // TODO - Check if workout is completed and if so, unlock (inside workout)
@@ -156,7 +154,7 @@ public class Exercise implements Config, Saveable {
         if (this.state == ActivityState.NOT_STARTED) {
             this.state = ActivityState.IN_PROGRESS;
         }
-        this.sets.add(new Set(this, type, weight, reps));
+        this.sets.add(new Set(this.exerciseID, type, weight, reps).setID);
         System.out.println("Added set with values, of type: " + type + " to exercise");
         return this.sets.get(this.sets.size() - 1);
     }
@@ -172,8 +170,9 @@ public class Exercise implements Config, Saveable {
 
     @Override
     public void save() {
-        if (User.mainUser == this.workout.getUser()) {
-            for (Set set : this.sets) {
+        if (User.mainUser == this.getWorkout().getUser()) {
+            for (UniqueID setID : this.sets) {
+                Set set = (Set)UniqueID.getLinked(setID);
                 set.save();
             }
         }
@@ -181,11 +180,16 @@ public class Exercise implements Config, Saveable {
     }
 
     public boolean hasOutstandingSets() {
-        for (Set set : this.sets) {
+        for (UniqueID setID : this.sets) {
+            Set set = (Set)UniqueID.getLinked(setID);
             if (set.state == ActivityState.IN_PROGRESS) {
                 return true;
             }
         }
         return false;
+    }
+
+    public Workout getWorkout() {
+        return (Workout)UniqueID.getLinked(this.workoutID);
     }
 }

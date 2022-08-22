@@ -3,9 +3,9 @@ import java.sql.Date;
 
 public class Workout implements Config, Saveable {
     public UniqueID userID;
-    private User user; // Use getUser()
+    //private User user; // Use getUser()
     public UniqueID workoutID;
-    public ArrayList<Exercise> exercises = new ArrayList<Exercise>();
+    public ArrayList<UniqueID> exercises = new ArrayList<UniqueID>();
     public ActivityState state;
     public boolean modified;
     public Date timeStarted;
@@ -15,27 +15,27 @@ public class Workout implements Config, Saveable {
     public Workout(UniqueID userID) {
         this.timeStarted = new Date(System.currentTimeMillis());
         this.userID = userID;
-        this.user = UniqueID.getUserByID(this.userID);
+        User user = UniqueID.getUserByID(this.userID);
         this.workoutID = new UniqueID(IDType.WORKOUT, user, this);
         this.state = ActivityState.NOT_STARTED;
         this.modified = false;
     }
 
-    public Workout(User user) {
-        this.timeStarted = new Date(System.currentTimeMillis());
-        this.userID = user.getID();
-        this.user = user;
-        this.workoutID = new UniqueID(IDType.WORKOUT, user, this);
-        this.state = ActivityState.NOT_STARTED;
-        this.modified = false;
-    }
+    // public Workout(User user) {
+    //     this.timeStarted = new Date(System.currentTimeMillis());
+    //     this.userID = user.getID();
+    //     this.user = user;
+    //     this.workoutID = new UniqueID(IDType.WORKOUT, user, this);
+    //     this.state = ActivityState.NOT_STARTED;
+    //     this.modified = false;
+    // }
 
     // Constructor for loading in data
     public Workout(UniqueID userID, UniqueID workoutID) {
         this.workoutID = workoutID;
         this.userID = userID;
-        this.user = UniqueID.getUserByID(userID);
-        this.user.importWorkoutFromDB(this);
+        User user = UniqueID.getUserByID(userID);
+        user.importWorkoutFromDB(this.workoutID);
         this.getWorkoutValuesFromDB();
         // TODO - Some function to put in a queue to populate
     }
@@ -48,7 +48,7 @@ public class Workout implements Config, Saveable {
         return this.workoutID;
     }
 
-    public Exercise addExercise() {
+    public UniqueID addExercise() {
         if (this.state == ActivityState.COMPLETED) {
             // Send message to ensure user knows workout is completed - this will flag as modified
             this.modified = true;
@@ -58,7 +58,7 @@ public class Workout implements Config, Saveable {
             this.state = ActivityState.IN_PROGRESS;
         }
 
-        this.exercises.add(new Exercise(this));
+        this.exercises.add(new Exercise(this.workoutID).exerciseID);
         System.out.println("Exercise added");
         return this.exercises.get(this.exercises.size() - 1);
     }
@@ -91,16 +91,14 @@ public class Workout implements Config, Saveable {
     }
 
     public User getUser() {
-        if (this.user == null) {
-            this.user = UniqueID.getUserByID(this.userID);
-        }
-        return this.user;
+        return UniqueID.getUserByID(this.userID);
     }
 
     @Override
     public void save() {
-        if (User.mainUser == this.user) {
-            for (Exercise exercise : this.exercises) {
+        if (User.mainUser == UniqueID.getUserByID(this.userID)) {
+            for (UniqueID exerciseID : this.exercises) {
+                Exercise exercise = (Exercise)UniqueID.getLinked(exerciseID);
                 exercise.save();
             }
         }
@@ -110,11 +108,12 @@ public class Workout implements Config, Saveable {
     public boolean completeWorkout() {
         if (this.state == ActivityState.IN_PROGRESS) {
             if (this.exercises.size() > 0) {
-                for (Exercise exercise : this.exercises) {
+                for (UniqueID exerciseID : this.exercises) {
+                    Exercise exercise = (Exercise) UniqueID.getLinked(exerciseID);
                     if (exercise.state != ActivityState.COMPLETED) {
                         // if all sets in the exercise are completed, complete the exercise
                         if (exercise.hasOutstandingSets()) {
-                            deleteExercise(exercise); // deleting unfinished exercises before completing workout
+                            deleteExercise(exerciseID); // deleting unfinished exercises before completing workout
                         } else {
                             exercise.completeExercise();
                         }
@@ -144,7 +143,8 @@ public class Workout implements Config, Saveable {
         }
     }
 
-    public boolean deleteExercise(Exercise exercise) {
+    public boolean deleteExercise(UniqueID exerciseID) {
+        //Exercise exercise = (Exercise) UniqueID.getLinked(exerciseID);
         if (this.state == ActivityState.COMPLETED) {
             // Send message to ensure user knows workout is completed - this will flag as modified
             this.modified = true;
@@ -155,8 +155,8 @@ public class Workout implements Config, Saveable {
             System.out.println("Exercise deleted from NOT_STARTED workout");
         }
         // if exercise is in workout, remove it
-        if (this.exercises.contains(exercise)) {
-            this.exercises.remove(exercise);
+        if (this.exercises.contains(exerciseID)) {
+            this.exercises.remove(exerciseID);
             System.out.println("Exercise deleted");
             return true;
         } else {
@@ -176,8 +176,8 @@ public class Workout implements Config, Saveable {
         return this.totalTime.getTime() / 1000 / 60;
     }
 
-    public void importExerciseFromDB(Exercise exercise) {
-        this.exercises.add(exercise);
+    public void importExerciseFromDB(UniqueID exerciseID) {
+        this.exercises.add(exerciseID);
     }
 
 }

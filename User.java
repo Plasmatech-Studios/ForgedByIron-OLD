@@ -9,7 +9,7 @@ public class User implements Config, Saveable {
     public Goal goal;
     public String profilePicture;
 
-    public ArrayList<Workout> workoutHistory = new ArrayList<Workout>();
+    public ArrayList<UniqueID> workoutHistory = new ArrayList<UniqueID>();
     public ArrayList<Badge> badges = new ArrayList<Badge>();
     public ArrayList<UniqueID> followers = new ArrayList<UniqueID>();
     public ArrayList<UniqueID> following = new ArrayList<UniqueID>();
@@ -53,26 +53,26 @@ public class User implements Config, Saveable {
         return this.currenWorkout;
     }
 
-    public void importWorkoutFromDB(Workout workout) {
-        this.workoutHistory.add(workout);
+    public void importWorkoutFromDB(UniqueID workoutID) {
+        this.workoutHistory.add(workoutID);
         // this data needs to be added correctly
     }
 
-    public void importSummaryFromDB(Summary summary) {
-        this.summaryHistory.add(summary);
-    }
+    // public void importSummaryFromDB(Summary summary) {
+    //     this.summaryHistory.add(summary);
+    // }
 
-    public void importBadgeFromDB(Badge badge) {
-        this.badges.add(badge);
-    }
+    // public void importBadgeFromDB(Badge badge) {
+    //     this.badges.add(badge);
+    // }
 
-    public void importGoalFromDB(Goal goal) {
-        this.goal = goal;
-    }
+    // public void importGoalFromDB(Goal goal) {
+    //     this.goal = goal;
+    // }
 
-    public void importProfilePictureFromDB(String profilePicture) {
-        this.profilePicture = profilePicture;
-    }
+    // public void importProfilePictureFromDB(String profilePicture) {
+    //     this.profilePicture = profilePicture;
+    // }
 
     public void importFollowersFromDB(UniqueID follower) {
         this.followers.add(follower);
@@ -98,11 +98,11 @@ public class User implements Config, Saveable {
         return this.currenWorkout;
     }
 
-    public Workout completeWorkout() {
+    public UniqueID completeWorkout() {
         if (this.currenWorkout != null) {
             if (this.currenWorkout.completeWorkout()) {
                 if (this.currenWorkout.exercises.size() > 0) {
-                    this.workoutHistory.add(this.currenWorkout);
+                    this.workoutHistory.add(this.currenWorkout.workoutID);
                     this.currenWorkout = null;
                     System.out.println("Workout completed");
                 } else {
@@ -134,9 +134,11 @@ public class User implements Config, Saveable {
     @Override
     public void save() {
         if (User.mainUser == this) {
-            for (Workout workout : this.workoutHistory) {
+            for (UniqueID workoutID : this.workoutHistory) {
+                Workout workout = (Workout)UniqueID.getLinked(workoutID);
                 workout.save();
             }
+            // TODO need to save more here
         }
     }
 }

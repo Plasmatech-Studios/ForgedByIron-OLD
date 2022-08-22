@@ -2,7 +2,7 @@ import java.sql.Date;
 
 public class Set implements Config, Saveable {
     public UniqueID exerciseID;
-    public Exercise exercise;
+    //public Exercise exercise;
     public UniqueID setID; // not on class diagram
     public float weight;
     public int reps;
@@ -15,20 +15,20 @@ public class Set implements Config, Saveable {
     public Date timeCompleted;
     public Date totalTime;
 
-    public Set(Exercise exercise, SetType setType) {
+    public Set(UniqueID exerciseID, SetType setType) {
         this.timeStarted = new Date(System.currentTimeMillis());
-        this.exercise = exercise;
-        this.exerciseID = exercise.getID();
-        this.setID = new UniqueID(IDType.SET, exercise.workout.getUser(), this);
+        this.exerciseID = exerciseID;
+        Exercise exercise = (Exercise)UniqueID.getLinked(this.exerciseID);
+        this.setID = new UniqueID(IDType.SET, exercise.getWorkout().getUser(), this);
         this.setType = setType;
         this.state = ActivityState.NOT_STARTED;
     }
 
-    public Set(Exercise exercise, SetType type, float weightTime, int reps) {
+    public Set(UniqueID exerciseID, SetType type, float weightTime, int reps) {
         this.timeStarted = new Date(System.currentTimeMillis());
-        this.exercise = exercise;
-        this.exerciseID = exercise.getID();
-        this.setID = new UniqueID(IDType.SET, exercise.workout.getUser(), this);
+        this.exerciseID = exerciseID;
+        Exercise exercise = (Exercise)UniqueID.getLinked(this.exerciseID);
+        this.setID = new UniqueID(IDType.SET, exercise.getWorkout().getUser(), this);
         this.state = ActivityState.NOT_STARTED;
         this.reps = reps;
         this.setType = type;
@@ -46,7 +46,7 @@ public class Set implements Config, Saveable {
     public Set(UniqueID exerciseID, UniqueID setID) {
         this.exerciseID = exerciseID;
         this.setID = setID;
-        exercise = (Exercise)UniqueID.getLinked(exerciseID);
+        Exercise exercise = (Exercise)UniqueID.getLinked(exerciseID);
         exercise.importSetFromDB(this);
         this.getSetValuesFromDB();
         // TODO - Some function to put in a queue to populate
@@ -59,7 +59,7 @@ public class Set implements Config, Saveable {
 
     @Override
     public void save() {
-        if (User.mainUser == this.exercise.workout.getUser()) {
+        if (User.mainUser == this.getExercise().getWorkout().getUser()) {
             // TODO - Save to database
         }
         
@@ -92,6 +92,10 @@ public class Set implements Config, Saveable {
     }
 
     public void deleteSet() {
-        this.exercise.deleteSet(this);
+        this.getExercise().deleteSet(this);
+    }
+
+    public Exercise getExercise() {
+        return (Exercise)UniqueID.getLinked(this.exerciseID);
     }
 }

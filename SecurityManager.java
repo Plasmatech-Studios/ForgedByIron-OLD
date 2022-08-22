@@ -26,15 +26,15 @@ public class SecurityManager implements Config {
         Date date = new Date(System.currentTimeMillis());
         testLogin.createWorkout();
         testLogin.getCurrentWorkout().addExercise();
-        testLogin.getCurrentWorkout().exercises.get(0).addSet(SetType.WEIGHT, 100.0f, 5);
-        testLogin.getCurrentWorkout().exercises.get(0).addSet(SetType.WEIGHT, 100.0f, 5);
-        testLogin.getCurrentWorkout().exercises.get(0).addSet(SetType.WEIGHT, 100.0f, 5);
-        testLogin.getCurrentWorkout().exercises.get(0).completeAllSets();
+        ((Exercise)(UniqueID.getLinked(testLogin.getCurrentWorkout().exercises.get(0)))).addSet(SetType.WEIGHT, 100.0f, 5);
+        ((Exercise)(UniqueID.getLinked(testLogin.getCurrentWorkout().exercises.get(0)))).addSet(SetType.WEIGHT, 100.0f, 5);
+        ((Exercise)(UniqueID.getLinked(testLogin.getCurrentWorkout().exercises.get(0)))).addSet(SetType.WEIGHT, 100.0f, 5);
+        ((Exercise)(UniqueID.getLinked(testLogin.getCurrentWorkout().exercises.get(0)))).completeAllSets();
         testLogin.completeWorkout();
         Date date2 = new Date(System.currentTimeMillis());
         System.out.println("Workout started at " + date.getTime() + " and completed at " + date2.getTime());
         System.out.println("Workout duration: " + (date2.getTime() - date.getTime()) + " milliseconds");
-        System.out.println("Workout duration: " + testLogin.workoutHistory.get(0).getWorkoutDurationMillis() + " milliseconds");
+        System.out.println("Workout duration: " + ((Workout)UniqueID.getLinked(testLogin.workoutHistory.get(0))).getWorkoutDurationMillis() + " milliseconds");
         //testLogin.workoutHistory.get(0).exercises.get(0).sets.get(0).setWeight(100.0f);
         //saveUserData();
     }
