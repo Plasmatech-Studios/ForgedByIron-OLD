@@ -10,9 +10,9 @@ public class UniqueID implements Config, Saveable {
     private Set set; // not in class diagram
     private Report report;
     private Badge badge;
-    private static HashMap<String, UniqueID> allUniqueIDsByID = new HashMap<String, UniqueID>();
-    private static HashMap<UniqueID, User> userMap = new HashMap<UniqueID, User>();
-    private static HashMap<UniqueID, Object> linkedObjectMap = new HashMap<UniqueID, Object>();
+    public static HashMap<String, UniqueID> allUniqueIDsByID = new HashMap<String, UniqueID>();
+    public static HashMap<UniqueID, User> userMap = new HashMap<UniqueID, User>();
+    public static HashMap<UniqueID, Object> linkedObjectMap = new HashMap<UniqueID, Object>();
 
     // todo how are we assigning these?
     public UniqueID(){
@@ -57,66 +57,6 @@ public class UniqueID implements Config, Saveable {
         linkedObjectMap.put(this, object);
     }
 
-    public static void buildObjects() {
-        for (UniqueID uniqueID : allUniqueIDsByID.values()) {
-            if (uniqueID.type == IDType.USER) {
-                createLinkedUser(uniqueID);
-            }
-        }
-        for (UniqueID uniqueID : allUniqueIDsByID.values()) {
-            if (uniqueID.type == IDType.WORKOUT) {
-                createLinkedWorkout(uniqueID);
-            }
-        }
-        for (UniqueID uniqueID : allUniqueIDsByID.values()) {
-            if (uniqueID.type == IDType.EXERCISE) {
-                createLinkedExercise(uniqueID);
-            }
-        }
-        for (UniqueID uniqueID : allUniqueIDsByID.values()) {
-            if (uniqueID.type == IDType.SET) {
-                createLinkedSet(uniqueID);
-            }
-        }
-
-        // populate the remaining data inside each object.
-
-    }
-
-    public static void populateObjectsOnLoad() {
-        for (Object workoutID : linkedObjectMap.values()) {
-            if (workoutID.getClass() == Workout.class) {
-                
-            }
-        }
-    }
-
-    public static void createLinkedUser(UniqueID userID) {
-        User user = new User(userID);
-        userMap.put(userID, user);
-    }
-
-    public static void createLinkedWorkout(UniqueID workoutID) {
-        // TODO - get user id from Database
-        UniqueID userID = new UniqueID("U" + workoutID.uniqueID, IDType.USER); // TODO - TEMP SOLUTION - REPLACE WITH LINKED USER FROM DB
-        Workout workout = new Workout(userID, workoutID);
-        linkedObjectMap.put(workoutID, workout);
-    }
-
-    public static void createLinkedExercise(UniqueID exerciseID) {
-        // TODO - get user id from Database
-        UniqueID createdByID = new UniqueID("CB" + exerciseID.uniqueID, IDType.USER); // TODO - TEMP SOLUTION - REPLACE WITH LINKED USER FROM DB
-        UniqueID workoutID = new UniqueID("W" + exerciseID.uniqueID, IDType.WORKOUT); // TODO - TEMP SOLUTION - REPLACE WITH LINKED WORKOUT FROM DB
-        Exercise exercise = new Exercise(createdByID, workoutID, exerciseID);
-        linkedObjectMap.put(exerciseID, exercise);
-    }
-
-    public static void createLinkedSet(UniqueID setID) {
-        // TODO - get user id from Database
-        UniqueID exerciseID = new UniqueID("E" + setID.uniqueID, IDType.WORKOUT); // TODO - TEMP SOLUTION - REPLACE WITH LINKED EXERCISE FROM DB
-        Set set = new Set(exerciseID, setID);
-        linkedObjectMap.put(setID, set);
-    }
 
     //getters
     public String getUniqueID() {

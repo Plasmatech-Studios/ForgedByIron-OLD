@@ -190,6 +190,7 @@ public class Exercise implements Config, Saveable {
     }
 
     public Workout getWorkout() {
+        // TODO check type before reutrning
         return (Workout)UniqueID.getLinked(this.workoutID);
     }
 }
