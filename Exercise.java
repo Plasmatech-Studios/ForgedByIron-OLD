@@ -159,9 +159,9 @@ public class Exercise implements Config, Saveable {
         return this.sets.get(this.sets.size() - 1);
     }
 
-    public boolean deleteSet(Set set) {
-        if (this.sets.contains(set)) {
-            this.sets.remove(set);
+    public boolean deleteSet(UniqueID setID) {
+        if (this.sets.contains(setID)) {
+            this.sets.remove(setID);
             return true;
         }
         System.out.println("Attempting to delete Set that does not exist in this exercise");

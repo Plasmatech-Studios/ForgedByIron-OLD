@@ -92,7 +92,7 @@ public class Set implements Config, Saveable {
     }
 
     public void deleteSet() {
-        this.getExercise().deleteSet(this);
+        this.getExercise().deleteSet(this.setID);
     }
 
     public Exercise getExercise() {
