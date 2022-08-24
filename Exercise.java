@@ -8,6 +8,7 @@ public class Exercise implements Config, Saveable {
     public UniqueID workoutID;
     //public Workout workout;
     public UniqueID exerciseID;
+    public int exerciseItemID;
     public String exerciseName;
     public ExerciseCatagory exerciseCatagory;
     public ExerciseMuscleGroup exerciseMuscleGroup;

@@ -4,16 +4,17 @@ public class User implements Config, Saveable {
     public static User mainUser; // Holds the signed in User.
     public UniqueID userID;
     public String username;
+    private String bio;
     protected static String secretKey;
-    public Summary summary;
-    public Goal goal;
+    public UniqueID summary;
+    public UniqueID goal;
     public String profilePicture;
 
     public ArrayList<UniqueID> workoutHistory = new ArrayList<UniqueID>();
     public ArrayList<Badge> badges = new ArrayList<Badge>();
     public ArrayList<UniqueID> followers = new ArrayList<UniqueID>();
     public ArrayList<UniqueID> following = new ArrayList<UniqueID>();
-    public ArrayList<Summary> summaryHistory = new ArrayList<Summary>();
+    public ArrayList<UniqueID> summaryHistory = new ArrayList<UniqueID>();
 
     public Workout currenWorkout;
 
@@ -31,6 +32,7 @@ public class User implements Config, Saveable {
         System.out.println("New user created: " + username);
     }
 
+    // TODO - DELETE THIS ONCE DB IMPLEMENTED, USE THE OTHER CONSTRUCTOR
     public User(String username, UniqueID userID, String secretKey) { // constructor for login new users - should only be called by SecurityManager
         this.userID = userID;
         this.username = username;
@@ -141,4 +143,13 @@ public class User implements Config, Saveable {
             // TODO need to save more here
         }
     }
+
+    public String getBio() {
+        return this.bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
 }

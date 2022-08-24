@@ -65,7 +65,7 @@ public class SecurityManager implements Config {
             System.out.println("Error: Password is incorrect");
             return null;
         }
-        User.mainUser = new User(username, userID, hashedPassword);
+        User.mainUser = new User(username, userID, hashedPassword);  // TODO Delete this later, will need to load from the DB
         User.secretKey = hashedPassword;
         return User.mainUser;
     }

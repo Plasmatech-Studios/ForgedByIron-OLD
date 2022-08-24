@@ -115,4 +115,20 @@ public class DataManager implements Config {
         Set set = new Set(exerciseID, setID);
         UniqueID.linkedObjectMap.put(setID, set);
     }
+
+    private static void getTableFromDB() {
+        // TODO - get table from DB
+    }
+
+    private static void getColumnFromDB() {
+        // TODO - get column from DB
+    }
+
+    private static void getRowFromDB() {
+        // TODO - get row from DB
+    }
+
+    private static void getValueFromDB() {
+        // TODO - get value from DB
+    }
 }

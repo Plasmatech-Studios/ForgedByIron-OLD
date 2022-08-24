@@ -44,7 +44,8 @@ public interface Config {
         EXERCISE,
         REPORT,
         BADGE,
-        SET
+        SET,
+        SUMMARY
         // QR
     }
 
