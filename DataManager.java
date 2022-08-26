@@ -30,6 +30,12 @@ public class DataManager implements Config {
                 createLinkedWorkout(uniqueID);
             }
         }
+        //exercisetype
+        for (UniqueID uniqueID : UniqueID.allUniqueIDsByID.values()) {
+            if (uniqueID.getType() == IDType.EXERCISE_TYPE) {
+                createLinkedExerciseType(uniqueID);
+            }
+        }
         for (UniqueID uniqueID : UniqueID.allUniqueIDsByID.values()) {
             if (uniqueID.getType() == IDType.EXERCISE) {
                 createLinkedExercise(uniqueID);
@@ -49,6 +55,10 @@ public class DataManager implements Config {
                 User user = workout.getUser(); // get the user from the workout
                 user.workoutHistory.add(workout.workoutID); // add the workout to the user's workout history
             }
+        }
+
+        for (ExerciseType exerciseType : UniqueID.exerciseTypeMap.values()) {
+            exerciseType.exerciseTypeID().setExerciseType(exerciseType); // Is this correct?
         }
 
         for (Object exerciseID : UniqueID.linkedObjectMap.values()) {
@@ -99,6 +109,11 @@ public class DataManager implements Config {
         UniqueID userID = new UniqueID("U" + workoutID.getUniqueID(), IDType.USER); // TODO - TEMP SOLUTION - REPLACE WITH LINKED USER FROM DB
         Workout workout = new Workout(userID, workoutID);
         UniqueID.linkedObjectMap.put(workoutID, workout);
+    }
+
+    private static void createLinkedExerciseType(UniqueID exerciseTypeID) {
+        ExerciseType exerciseType = ExerciseType.createNewExerciseType(exerciseTypeID);
+        UniqueID.exerciseTypeMap.put(exerciseTypeID, exerciseType);
     }
 
     private static void createLinkedExercise(UniqueID exerciseID) {

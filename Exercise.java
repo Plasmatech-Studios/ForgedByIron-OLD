@@ -6,15 +6,11 @@ import org.w3c.dom.events.Event;
 public class Exercise implements Config, Saveable {
     public UniqueID createdByID;
     public UniqueID workoutID;
-    //public Workout workout;
     public UniqueID exerciseID;
-    public int exerciseItemID;
-    public String exerciseName;
-    public ExerciseCatagory exerciseCatagory;
-    public ExerciseMuscleGroup exerciseMuscleGroup;
+    public UniqueID exerciseItemID; // implement this w/ DB and type/name/description
+
     public ActivityState state;
-    public String exerciseDescription; // not on class diagram
-    public ArrayList<Event> events = new ArrayList<Event>();
+    public ArrayList<Event> events = new ArrayList<Event>(); // Should this be UniqueID too???
     public ArrayList<UniqueID> sets = new ArrayList<UniqueID>();
 
     public Date timeStarted;

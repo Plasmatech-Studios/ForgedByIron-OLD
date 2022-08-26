@@ -7,12 +7,14 @@ public class UniqueID implements Config, Saveable {
     private User user;
     private Workout workout;
     private Exercise exercise;
+    private ExerciseType exerciseType;
     private Set set; // not in class diagram
     private Report report;
     private Badge badge;
     public static HashMap<String, UniqueID> allUniqueIDsByID = new HashMap<String, UniqueID>();
     public static HashMap<UniqueID, User> userMap = new HashMap<UniqueID, User>();
     public static HashMap<UniqueID, Object> linkedObjectMap = new HashMap<UniqueID, Object>();
+    public static HashMap<UniqueID, ExerciseType> exerciseTypeMap = new HashMap<UniqueID, ExerciseType>();
 
     // todo how are we assigning these?
     public UniqueID(){
@@ -98,6 +100,14 @@ public class UniqueID implements Config, Saveable {
         }
     }
 
+    public void setExerciseType (ExerciseType exerciseType) {
+        if (this.type == IDType.EXERCISE_TYPE) {
+            this.exerciseType = exerciseType;
+        } else {
+            System.out.println("Error: Attempting to assign an exercise type to a UniqueID that is not an exercise type");
+        }
+    }
+
     public void setExercise(Exercise exercise) {
         if (this.type == IDType.EXERCISE) {
             this.exercise = exercise;
@@ -137,6 +147,10 @@ public class UniqueID implements Config, Saveable {
         }
         if (type == IDType.EXERCISE) {
             this.exercise = (Exercise) object;
+            return;
+        }
+        if (type == IDType.EXERCISE_TYPE) {
+            this.exerciseType = ExerciseType.createNewExerciseType(this);
             return;
         }
         if (type == IDType.SET) {

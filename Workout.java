@@ -5,6 +5,7 @@ public class Workout implements Config, Saveable {
     public UniqueID userID;
     //private User user; // Use getUser()
     public UniqueID workoutID;
+    public UniqueID createdByID; // TODO handle this
     public ArrayList<UniqueID> exercises = new ArrayList<UniqueID>();
     public ActivityState state;
     public boolean modified;

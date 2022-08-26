@@ -42,6 +42,7 @@ public interface Config {
         USER,
         WORKOUT,
         EXERCISE,
+        EXERCISE_TYPE,
         REPORT,
         BADGE,
         SET,
