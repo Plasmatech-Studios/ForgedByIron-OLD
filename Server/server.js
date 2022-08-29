@@ -1,31 +1,25 @@
+const sqlite3 = require('sqlite3').verbose();
+
 const { readFileSync, writeFileSync } = require('fs');
 const path = require('path');
-const fileLoc = path.join(__dirname, 'count.txt');
+const saveFileLoc = path.join(__dirname, 'count.txt');
+const dbLoc = path.join(__dirname, 'FBI.db');
 const express = require('express');
+const bodyParser = require("body-parser");
 
-//const cors = require('cors'); // Do i need this?
-
+const router = express.Router();
 const app = express();
-//app.use(cors()); // Do i need this?
+app.use('/' , router);
+app.use('/HCS' , router);
+app.use('FBI_AUTH' , router);
 
-app.get('/', (req, res) => {
-    
-    const data = readFileSync(fileLoc, 'utf8');
-    const count = parseInt(data) + 1;
-    console.log('\n',new Date().toLocaleString("en-US", {timeZone: "Australia/Sydney"}),'\n New Connection! New count:', count);
-    writeFileSync(fileLoc, count.toString());
-    console.log(req.headers);
-    // check if the req headers contain the header cmd
-    if (req.headers.cmd) {
-        console.log('cmd header found!');
-    }
-    if (req.headers['cmd'] == 'get') {
-        console.log('Loading UID!', req.headers['uid']);
-        console.log('Data Loaded', req.headers['data']);
-        res.send('Test header found!');
-    } else {
-        res.send(`
-        
+app.use(bodyParser.urlencoded({ extended: true }));
+
+router.get('/', (req, res) => {
+    const count = readFileSync(saveFileLoc, 'utf8');
+    const newCount = parseInt(count) + 1;
+    writeFileSync(saveFileLoc, newCount.toString());
+    res.send(`        
             <!DOCTYPE html>
             <html lang="en">
             <head>
@@ -37,15 +31,82 @@ app.get('/', (req, res) => {
                 <h1>Welcome to Forged By Iron</h1>
                 <h2>This page has been viewed ${count} times!</h2>
             </body>
-            </html>    
-        
+            </html>            
         `);
+
+    console.log('get request', count, req.headers);
+});
+
+
+    //res.sendFile(path.join(__dirname, 'index.html'));
+
+router.get('/HCS', (req, res) => {
+    console.log('HCS get request', req.headers);
+    res.sendFile(path.join(__dirname, 'HCS_Sign.html'));
+
+});
+
+// Used to log in Users to the FBI System, redirects to the main page the request is invalid
+router.get('/FBI_AUTH', (req, res) => {
+    console.log('FBI_AUTH get request', req.headers);
+    // check if a header is present
+    if (req.headers["x-fbi-username"] && req.headers["x-fbi-secretkey"]) { // Required headers
+        console.log('FBI_AUTH get request', req.headers["x-fbi-username"], req.headers["x-fbi-secretkey"]);
+        // Do something
+        res.send('Welcome ' + req.headers["x-fbi-username"]);
+
+    } else {
+        console.log('Invalid request to FBI_AUTH');
+        res.sendFile(path.join(__dirname, 'index.html'));
     }
-
 });
 
-app.get('/api', (req, res) => {
-    console.log(req);
-    res.send('Hi there!');
+// Used to get data from the FBI System, redirects to the main page the request is invalid
+router.get('/FBI_GET', (req, res) => {
+    console.log('FBI_GET get request', req.headers);
+    // check if a header is present
+    if (req.headers["x-fbi-command"] && req.headers["x-fbi-uniqueid"] && req.headers["x-fbi-username"] && req.headers["x-fbi-secretkey"]) { // Required headers
+        console.log('FBI_GET get request command:', req.headers["x-fbi-command"], "requested object", req.headers["x-fbi-uniqueid"] , "from User: " + req.headers["x-fbi-username"]);
+        // Do something
+        res.send('Here is your data ' + req.headers["x-fbi-username"]);
+
+    } else {
+        console.log('Invalid request to FBI_GET');
+        res.sendFile(path.join(__dirname, 'index.html'));
+    }
 });
+
+
+// Currently only used for HCS
+router.post('/HCS', (req, res) => {
+    console.log('post request', req.body);
+    const count = readFileSync(saveFileLoc, 'utf8');
+    const newCount = parseInt(count) + 1;
+    writeFileSync(saveFileLoc, newCount.toString());
+    res.send(`Count: ${newCount}`);
+});
+
 app.listen(5000, () => console.log('http://localhost:5000'));
+
+
+
+////////////////////////////////////////////////////////////////////
+// DATEBASE CODE
+////////////////////////////////////////////////////////////////////
+// create a new database 
+
+let db = new sqlite3.Database('./db/FBI.db', (err) => {
+  if (err) {
+    return console.error('am i here', err.message);
+  }
+  console.log('Connected to the Forged By Iron SQlite database.');
+});
+
+
+// close the database connection
+db.close((err) => {
+  if (err) {
+    return console.error(err.message);
+  }
+  console.log('Closed the database connection.');
+});

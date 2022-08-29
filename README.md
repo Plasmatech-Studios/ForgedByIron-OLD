@@ -34,3 +34,6 @@ public static String[] convertStringToArray(String str){
     String[] arr = str.split(strSeparator);
     return arr;
 }
+
+npm install sqlite3
+npm install body-parser
