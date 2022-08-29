@@ -1,0 +1,12 @@
+ssh pi@192.168.1.205/112
+password
+
+sudo su
+ifconfig
+/usr/local/bin/noip2
+sudo /etc/init.d/nginx start
+node /home/pi/Documents/FBI_Test_Server/server.js
+
+sudo raspi-config
+
+cd /D E:\Uni STUFF\2022\S2\ITC209 Mobile\A4\Application\ForgedByIron\Server
