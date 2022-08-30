@@ -3,7 +3,7 @@ const sqlite3 = require('sqlite3').verbose();
 const { readFileSync, writeFileSync } = require('fs');
 const path = require('path');
 const saveFileLoc = path.join(__dirname, 'count.txt');
-const dbLoc = path.join(__dirname, 'FBI.db');
+const dbLoc = path.join(__dirname, '/db/FBI.db');
 const express = require('express');
 const bodyParser = require("body-parser");
 
@@ -95,7 +95,7 @@ app.listen(5000, () => console.log('http://localhost:5000'));
 ////////////////////////////////////////////////////////////////////
 // create a new database 
 
-let db = new sqlite3.Database('./db/FBI.db', (err) => {
+let db = new sqlite3.Database(dbLoc, (err) => {
   if (err) {
     return console.error('am i here', err.message);
   }
