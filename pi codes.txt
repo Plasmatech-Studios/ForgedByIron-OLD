@@ -1,4 +1,4 @@
-ssh pi@192.168.1.205/112
+ssh pi@192.168.1.112 OR 205
 password
 
 sudo su
