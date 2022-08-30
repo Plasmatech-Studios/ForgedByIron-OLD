@@ -5,7 +5,7 @@ sudo su
 ifconfig
 /usr/local/bin/noip2
 sudo /etc/init.d/nginx start
-node /home/pi/Documents/FBI_Test_Server/server.js
+node /home/pi/Documents/FBI/ForgedByIron/Server
 
 sudo raspi-config
 
