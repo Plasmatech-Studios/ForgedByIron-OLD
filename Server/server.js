@@ -10,8 +10,8 @@ const bodyParser = require("body-parser");
 const router = express.Router();
 const app = express();
 app.use('/' , router);
-app.use('/HCS' , router);
-app.use('FBI_AUTH' , router);
+app.use('/api' , router);
+app.use('/FBI_AUTH' , router);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -40,7 +40,7 @@ router.get('/', (req, res) => {
 
     //res.sendFile(path.join(__dirname, 'index.html'));
 
-router.get('/HCS', (req, res) => {
+router.get('/api', (req, res) => {
     console.log('HCS get request', req.headers);
     res.sendFile(path.join(__dirname, 'HCS_Sign.html'));
 
@@ -78,7 +78,7 @@ router.get('/FBI_GET', (req, res) => {
 
 
 // Currently only used for HCS
-router.post('/HCS', (req, res) => {
+router.post('/api', (req, res) => {
     console.log('post request', req.body);
     const count = readFileSync(saveFileLoc, 'utf8');
     const newCount = parseInt(count) + 1;
