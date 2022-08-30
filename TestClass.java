@@ -11,8 +11,8 @@ public class TestClass implements Config {
         
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-          //.uri(URI.create("http://fbi.sytes.net/")) //getting the correct Route
-          .uri(URI.create("http://localhost:5000/FBI_AUTH")) //for local testing
+          .uri(URI.create("http://fbi.sytes.net/api/")) //getting the correct Route
+          //.uri(URI.create("http://localhost:5000/FBI_AUTH")) //for local testing
           .header("x-fbi-username", "Pete")
           .header("x-fbi-secretkey", "123456789")
           //.POST(HttpRequest.BodyPublishers.
@@ -26,14 +26,15 @@ public class TestClass implements Config {
         }
 
         request = HttpRequest.newBuilder()
-          //.uri(URI.create("http://fbi.sytes.net/")) //getting the correct Route
-          .uri(URI.create("http://localhost:5000/FBI_GET")) //for local testing
+          .uri(URI.create("http://fbi.sytes.net/api/")) //getting the correct Route
+          //.uri(URI.create("http://localhost:5000/hcs")) //for local testing
+          .POST(HttpRequest.BodyPublishers.ofString("{'name': 'test', 'age': 20}"))
           .header("x-fbi-command", "Pete")
           .header("x-fbi-uniqueid", "123456789")          
           .header("x-fbi-username", "Pete")
           .header("x-fbi-secretkey", "123456789")
           //.POST(HttpRequest.BodyPublishers.
-          .header("data", "{'name': 'test', 'age': 20}")
+          .header("data", "{'name': 'test', 'age': 10}")
           .build();
         try {
             HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
