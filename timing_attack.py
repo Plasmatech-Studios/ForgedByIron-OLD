@@ -6,12 +6,9 @@ import timeit
 import numpy as np
 
 allowed_chars = string.ascii_lowercase + " " #+ string.digits 
-password_database = {"Pete": "password123"}
+password_database = {"Pete": "password"}
 
-
-# Unless you have a very stable computer,
-# you will only be able to crack the length of the password
-# if you use this check_password
+# if the PC is to unstable, crack length only
 # def check_password(user, guess):
 #     actual = password_database[user]
 #     return actual == guess
