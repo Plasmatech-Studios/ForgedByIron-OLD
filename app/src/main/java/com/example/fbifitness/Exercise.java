@@ -1,7 +1,7 @@
+package com.example.fbifitness;
+
 import java.sql.Date;
 import java.util.ArrayList;
-
-import org.w3c.dom.events.Event;
 
 public class Exercise implements Config, Saveable {
     public UniqueID createdByID;
@@ -10,7 +10,7 @@ public class Exercise implements Config, Saveable {
     public UniqueID exerciseItemID; // implement this w/ DB and type/name/description
 
     public ActivityState state;
-    public ArrayList<Event> events = new ArrayList<Event>(); // Should this be UniqueID too???
+    //public ArrayList<Event> events = new ArrayList<Event>(); // Should this be UniqueID too???
     public ArrayList<UniqueID> sets = new ArrayList<UniqueID>();
 
     public Date timeStarted;

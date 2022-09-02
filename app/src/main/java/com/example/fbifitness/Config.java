@@ -1,3 +1,5 @@
+package com.example.fbifitness;
+
 public interface Config {
 
     public enum ActivityState {

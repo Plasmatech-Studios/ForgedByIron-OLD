@@ -1,4 +1,6 @@
-public class SessionController {    
+package com.example.fbifitness;
+
+public class SessionController {
 
     //Singleton 
     private static SessionController instance = null;

@@ -1,3 +1,5 @@
+package com.example.fbifitness;
+
 public class Report implements Config, Saveable {
 
     UniqueID reportID;

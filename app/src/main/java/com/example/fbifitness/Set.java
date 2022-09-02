@@ -1,3 +1,5 @@
+package com.example.fbifitness;
+
 import java.sql.Date;
 
 public class Set implements Config, Saveable {

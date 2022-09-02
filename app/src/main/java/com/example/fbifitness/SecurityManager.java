@@ -1,3 +1,5 @@
+package com.example.fbifitness;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.nio.charset.StandardCharsets;
@@ -10,6 +12,7 @@ public class SecurityManager implements Config {
 
     private static HashMap<String, UniqueID> usernameMap = new HashMap<String, UniqueID>();
     private static HashMap<UniqueID, String> passwordMap = new HashMap<UniqueID, String>();
+
     public static void main(String args[])  throws NoSuchAlgorithmException {
         String username = "admin";
         String password = "password";

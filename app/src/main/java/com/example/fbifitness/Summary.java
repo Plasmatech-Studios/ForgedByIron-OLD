@@ -1,3 +1,5 @@
+package com.example.fbifitness;
+
 import java.sql.Date;
 
 public class Summary implements Config, Saveable {

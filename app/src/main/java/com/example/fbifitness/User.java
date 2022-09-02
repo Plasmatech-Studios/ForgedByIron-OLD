@@ -1,3 +1,5 @@
+package com.example.fbifitness;
+
 import java.util.ArrayList;
 
 public class User implements Config, Saveable {

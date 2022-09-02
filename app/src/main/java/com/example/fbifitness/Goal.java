@@ -1,3 +1,5 @@
+package com.example.fbifitness;
+
 public class Goal implements Config, Saveable {
     
 

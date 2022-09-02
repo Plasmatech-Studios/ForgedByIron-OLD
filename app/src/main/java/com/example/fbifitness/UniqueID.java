@@ -1,3 +1,5 @@
+package com.example.fbifitness;
+
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -150,7 +152,7 @@ public class UniqueID implements Config, Saveable {
             return;
         }
         if (type == IDType.EXERCISE_TYPE) {
-            this.exerciseType = ExerciseType.createNewExerciseType(this);
+            //this.exerciseType = ExerciseType.createNewExerciseType(this);
             return;
         }
         if (type == IDType.SET) {
