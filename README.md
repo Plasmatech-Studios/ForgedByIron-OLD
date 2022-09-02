@@ -35,5 +35,8 @@ public static String[] convertStringToArray(String str){
     return arr;
 }
 
+npm install
+or 
+npm install express
 npm install sqlite3
 npm install body-parser
