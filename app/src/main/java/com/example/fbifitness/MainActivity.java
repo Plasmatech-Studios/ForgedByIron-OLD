@@ -1,11 +1,17 @@
 package com.example.fbifitness;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.annotation.SuppressLint;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.EditText;
 
 import com.example.fbifitness.databinding.ActivityMainBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -17,8 +23,10 @@ public class MainActivity extends AppCompatActivity {
     public Fragment newWorkoutFragment = new NewWorkoutFragment();
     public Fragment badgeFragment = new BadgeFragment();
     public Fragment profileFragment = new ProfileFragment();
+    public Toolbar toolbar;
 
-    ActivityMainBinding binding;
+    static DataManager dbManager;
+    static ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,33 +35,53 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-//        Fragment communityFragment = new CommunityFragment();
-//        Fragment reportsFragment = new ReportsFragment();
-//        Fragment newWorkoutFragment = new NewWorkoutFragment();
-//        Fragment badgeFragment = new BadgeFragment();
-//        Fragment profileFragment = new ProfileFragment();
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
+        dbManager = new DataManager(this);
+        try {
+            dbManager.open();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Setup default page
         BottomNavigationView bottomNavigationView;
         bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setSelectedItemId(R.id.profile);
         replaceFragment(profileFragment); // Replace this with login screen later
+        toolbar.setTitle("Profile");
+        toolbar.setNavigationIcon(R.drawable.ic_baseline_qr_code_24);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("Hi", "Dad");
+            }
+        });
+
+
 
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
 
             switch(item.getItemId()) {
                 case R.id.community:
+                    toolbar.setTitle("Community");
                     replaceFragment(communityFragment);
                     break;
                 case R.id.reports:
+                    toolbar.setTitle("Reports");
                     replaceFragment(reportsFragment);
                     break;
                 case R.id.newWorkout:
+                    toolbar.setTitle("Workout");
                     replaceFragment(newWorkoutFragment);
                     break;
                 case R.id.badges:
+                    toolbar.setTitle("Badges");
                     replaceFragment(badgeFragment);
                     break;
                 case R.id.profile:
+                    toolbar.setTitle("Profile");
                     replaceFragment(profileFragment);
                     break;
             }

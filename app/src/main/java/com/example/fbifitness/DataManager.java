@@ -4,13 +4,14 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import java.sql.SQLDataException;
 
 public class DataManager implements Config {
     private DatabaseHelper dbHelper;
     private Context context;
-    private SQLiteDatabase database;
+    protected static SQLiteDatabase database;
 
     public DataManager(Context ctx) {
         context = ctx;
@@ -19,6 +20,13 @@ public class DataManager implements Config {
     public DataManager open() throws SQLDataException {
         dbHelper = new DatabaseHelper(context);
         database = dbHelper.getWritableDatabase();
+        dropAllTables();
+        createTables();
+        database.execSQL("DROP TABLE IF EXISTS USER;"); // TODO Remove before production);
+        database.execSQL(DatabaseHelper.CREATE_LOCAL_USER_TABLE_QUERY);
+
+        //database.execSQL(DatabaseHelper.CREATE_LOCAL_USER_TABLE_QUERY);
+
         return this;
 
     }
@@ -27,7 +35,37 @@ public class DataManager implements Config {
         dbHelper.close();
     }
 
-    public void insertLogin(String inUsername, String inUserID) {
+    private void dropAllTables() {
+        database.execSQL(DatabaseHelper.DROP_AUTH_TABLE);
+        database.execSQL(DatabaseHelper.DROP_LOGIN_TABLE);
+        database.execSQL(DatabaseHelper.DROP_USER_TABLE);
+        database.execSQL(DatabaseHelper.DROP_WORKOUT_TABLE);
+        database.execSQL(DatabaseHelper.DROP_EXERCISE_TABLE);
+        database.execSQL(DatabaseHelper.DROP_SET_TABLE);
+        database.execSQL(DatabaseHelper.DROP_EXERCISE_TYPE_TABLE);
+        Log.d("WARNING", "ALL TABLES DROPPED");
+    }
+
+    private void createTables() {
+        database.execSQL(DatabaseHelper.CREATE_LOCAL_AUTH_TABLE_QUERY);
+        database.execSQL(DatabaseHelper.CREATE_LOCAL_LOGIN_TABLE_QUERY);
+        database.execSQL(DatabaseHelper.CREATE_LOCAL_USER_TABLE_QUERY);
+        database.execSQL(DatabaseHelper.CREATE_LOCAL_WORKOUT_TABLE_QUERY);
+        database.execSQL(DatabaseHelper.CREATE_LOCAL_EXERCISE_TABLE_QUERY);
+        database.execSQL(DatabaseHelper.CREATE_LOCAL_SET_TABLE_QUERY);
+        database.execSQL(DatabaseHelper.CREATE_LOCAL_EXERCISE_TYPE_TABLE_QUERY);
+        Log.d("WARNING", "ALL TABLES CREATED");
+    }
+
+    public static void insertLogin(String inUsername, String inUserID) {
+        // Ensure a user with the same ID does not already exist using select count
+        String countQuery = "SELECT * FROM " + DatabaseHelper.LOGIN_TABLE + " WHERE " + DatabaseHelper.LOGIN_USER_ID + " = '" + inUserID + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() > 0) {
+            Log.d("WARNING", "User with that ID already exists");
+            return;
+        }
+            
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseHelper.LOGIN_USERNAME, inUsername);
         contentValues.put(DatabaseHelper.LOGIN_USER_ID, inUserID);
@@ -35,7 +73,15 @@ public class DataManager implements Config {
         database.insert(DatabaseHelper.LOGIN_TABLE, null, contentValues);
     }
 
-    public void insertAuth(String inUserID, String inSecretKey) {
+   public static void insertAuth(String inUserID, String inSecretKey) {
+        // Ensure a user with the same ID does not already exist using select count
+        String countQuery = "SELECT * FROM " + DatabaseHelper.AUTH_TABLE + " WHERE " + DatabaseHelper.AUTH_USER_ID + " = '" + inUserID + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() > 0) {
+            Log.d("WARNING", "User with that ID already exists");
+            return;
+        }
+        
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseHelper.AUTH_USER_ID, inUserID);
         contentValues.put(DatabaseHelper.AUTH_SECRET_KEY, inSecretKey);
@@ -43,36 +89,60 @@ public class DataManager implements Config {
         database.insert(DatabaseHelper.AUTH_TABLE, null, contentValues);
     }
 
-    public void insertUser(String inUserID, String inUsername, String inSecretKey) {
+    public static void insertUser(String inUserID, String inUsername, String inSecretKey) {
+        //Ensure a user with the same ID does not already exist using select count
+        String countQuery = "SELECT * FROM " + DatabaseHelper.USER_TABLE + " WHERE " + DatabaseHelper.USER_USER_ID + " = '" + inUserID + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() > 0) {
+            Log.d("WARNING", "User with that ID already exists");
+            return;
+        }
+
         ContentValues contentValues = new ContentValues();
-        contentValues.put(DatabaseHelper.USER_USER_ID, inUserID);
-        contentValues.put(DatabaseHelper.USER_USERNAME, inUsername);
-        contentValues.put(DatabaseHelper.USER_SECRET_KEY, inSecretKey);
+        contentValues.put("userID", inUserID);
+        contentValues.put("username", inUsername);
+        contentValues.put("secretKey", inSecretKey);
 
         database.insert(DatabaseHelper.USER_TABLE, null, contentValues);
     }
 
-    public void insertWorkout(String inWorkoutID, String inUserID, String inCreatedByID,
-                              String inWorkoutName, String inState, String inModified,
-                              String inTimeStarted, String inTimeCompleted, String inTotalTime) {
+   public static void insertWorkout(String inWorkoutID, String inUserID, String inCreatedByID,
+                             String inWorkoutName, String inState, String inModified,
+                             String inTimeStarted, String inTimeCompleted, String inTotalTime) {
 
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(DatabaseHelper.WORKOUT_WORKOUT_ID, inWorkoutID);
-        contentValues.put(DatabaseHelper.WORKOUT_USER_ID, inUserID);
-        contentValues.put(DatabaseHelper.WORKOUT_CREATED_BY_ID, inCreatedByID);
-        contentValues.put(DatabaseHelper.WORKOUT_WORKOUT_NAME, inWorkoutName);
-        contentValues.put(DatabaseHelper.WORKOUT_STATE, inState);
-        contentValues.put(DatabaseHelper.WORKOUT_MODIFIED, inModified);
-        contentValues.put(DatabaseHelper.WORKOUT_TIME_STARTED, inTimeStarted);
-        contentValues.put(DatabaseHelper.WORKOUT_TIME_COMPLETED, inTimeCompleted);
-        contentValues.put(DatabaseHelper.WORKOUT_TOTAL_TIME, inTotalTime);
+        // Ensure a workout with the same ID does not already exist using select count
+        String countQuery = "SELECT * FROM " + DatabaseHelper.WORKOUT_TABLE + " WHERE " + DatabaseHelper.WORKOUT_WORKOUT_ID + " = '" + inWorkoutID + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() > 0) {
+            Log.d("WARNING", "Workout with that ID already exists");
+            return;
+        }
 
-        database.insert(DatabaseHelper.WORKOUT_TABLE, null, contentValues);
+       ContentValues contentValues = new ContentValues();
+       contentValues.put(DatabaseHelper.WORKOUT_WORKOUT_ID, inWorkoutID);
+       contentValues.put(DatabaseHelper.WORKOUT_USER_ID, inUserID);
+       contentValues.put(DatabaseHelper.WORKOUT_CREATED_BY_ID, inCreatedByID);
+       contentValues.put(DatabaseHelper.WORKOUT_WORKOUT_NAME, inWorkoutName);
+       contentValues.put(DatabaseHelper.WORKOUT_STATE, inState);
+       contentValues.put(DatabaseHelper.WORKOUT_MODIFIED, inModified);
+       contentValues.put(DatabaseHelper.WORKOUT_TIME_STARTED, inTimeStarted);
+       contentValues.put(DatabaseHelper.WORKOUT_TIME_COMPLETED, inTimeCompleted);
+       contentValues.put(DatabaseHelper.WORKOUT_TOTAL_TIME, inTotalTime);
+
+       database.insert(DatabaseHelper.WORKOUT_TABLE, null, contentValues);
     }
 
-    public void insertExercise(String inExerciseID, String inWorkoutID, String inExerciseTypeID,
-                               String inUserID, String inCreatedByID, String inState,
-                               String inTimeStarted, String inTimeCompleted, String inTotalTime) {
+   public static void insertExercise(String inExerciseID, String inWorkoutID, String inExerciseTypeID,
+                              String inUserID, String inCreatedByID, String inState,
+                              String inTimeStarted, String inTimeCompleted, String inTotalTime) {
+
+        // Ensure an exercise with the same ID does not already exist using select count
+        String countQuery = "SELECT * FROM " + DatabaseHelper.EXERCISE_TABLE + " WHERE " + DatabaseHelper.EXERCISE_EXERCISE_ID + " = '" + inExerciseID + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() > 0) {
+            Log.d("WARNING", "Exercise with that ID already exists");
+            return;
+        }
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseHelper.EXERCISE_EXERCISE_ID, inExerciseID);
@@ -88,9 +158,17 @@ public class DataManager implements Config {
         database.insert(DatabaseHelper.EXERCISE_TABLE, null, contentValues);
     }
 
-    public void insertSet(String inSetID, String inExerciseID, String inWeight, String inReps,
-                               String inSetNumber, String inTimeSeconds, String inSetType, String inState,
-                               String inTimeStarted, String inTimeCompleted, String inTotalTime) {
+   public static void insertSet(String inSetID, String inExerciseID, String inWeight, String inReps,
+                              String inSetNumber, String inTimeSeconds, String inSetType, String inState,
+                              String inTimeStarted, String inTimeCompleted, String inTotalTime) {
+
+        // Ensure a set with the same ID does not already exist using select count
+        String countQuery = "SELECT * FROM " + DatabaseHelper.SET_TABLE + " WHERE " + DatabaseHelper.SET_SET_ID + " = '" + inSetID + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() > 0) {
+            Log.d("WARNING", "Set with that ID already exists");
+            return;
+        }
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseHelper.SET_SET_ID, inSetID);
@@ -108,8 +186,17 @@ public class DataManager implements Config {
         database.insert(DatabaseHelper.SET_TABLE, null, contentValues);
     }
 
-    public void insertExerciseType(String inExerciseTypeID, String inExerciseName, String inExerciseDescription,
-                                   String inExerciseCategory, String inExerciseMuscleGroup) {
+   public static void insertExerciseType(String inExerciseTypeID, String inExerciseName, String inExerciseDescription,
+                                  String inExerciseCategory, String inExerciseMuscleGroup) {
+        
+        // Ensure an exercise type with the same ID does not already exist using select count
+        String countQuery = "SELECT * FROM " + DatabaseHelper.EXERCISE_TYPE_TABLE + " WHERE " + DatabaseHelper.EXERCISE_TYPE_EXERCISE_TYPE_ID + " = '" + inExerciseTypeID + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() > 0) {
+            Log.d("WARNING", "Exercise type with that ID already exists");
+            return;
+        }
+
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseHelper.EXERCISE_TYPE_EXERCISE_TYPE_ID, inExerciseTypeID);
         contentValues.put(DatabaseHelper.EXERCISE_TYPE_EXERCISE_NAME, inExerciseName);
@@ -120,25 +207,33 @@ public class DataManager implements Config {
         database.insert(DatabaseHelper.EXERCISE_TYPE_TABLE, null, contentValues);
     }
 
-    public Cursor fetchUser(String uniqueID) {
-        String [] columns = new String[] {DatabaseHelper.USER_USER_ID, DatabaseHelper.USER_USERNAME, DatabaseHelper.USER_SECRET_KEY};
-        Cursor cursor = database.query(DatabaseHelper.USER_TABLE, columns, DatabaseHelper.USER_USER_ID + "=" + uniqueID, null, null, null, null); // Added the selection
-            if (cursor != null) {
-                cursor.moveToFirst();
-            }
-        return cursor;
-    }
+//    public Cursor fetchUser(String uniqueID) {
+//        String [] columns = new String[] {DatabaseHelper.USER_USER_ID, DatabaseHelper.USER_USERNAME, DatabaseHelper.USER_SECRET_KEY};
+//        Cursor cursor = database.query(DatabaseHelper.USER_TABLE, columns, DatabaseHelper.USER_USER_ID + "=" + uniqueID, null, null, null, null); // Added the selection
+//            if (cursor != null) {
+//                cursor.moveToFirst();
+//            }
+//        return cursor;
+//    }
+//
+//    public static int updateUser(String uniqueID, String inUsername, String inSecretKey) {
+//        ContentValues contentValues = new ContentValues();
+//        contentValues.put(DatabaseHelper.USER_USERNAME, inUsername);
+//        contentValues.put(DatabaseHelper.USER_SECRET_KEY, inSecretKey);
+//        int ret = database.update(DatabaseHelper.USER_TABLE, contentValues, DatabaseHelper.USER_USER_ID + "=" + uniqueID, null); // may need '' marks around uniqueID
+//        return ret;
+//    }
 
-    public int updateUser(String uniqueID, String inUsername, String inSecretKey) {
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(DatabaseHelper.USER_USERNAME, inUsername);
-        contentValues.put(DatabaseHelper.USER_SECRET_KEY, inSecretKey);
-        int ret = database.update(DatabaseHelper.USER_TABLE, contentValues, DatabaseHelper.USER_USER_ID + "=" + uniqueID, null);
-        return ret;
-    }
-
-    public void deleteUser(String uniqueID) {
-        database.delete(DatabaseHelper.USER_TABLE, DatabaseHelper.USER_USER_ID + "=" + uniqueID, null);
+   public static void deleteUser(String uniqueID) {
+        // Ensure user exists
+        String countQuery = "SELECT * FROM " + DatabaseHelper.USER_TABLE + " WHERE " + DatabaseHelper.USER_USER_ID + " = '" + uniqueID + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() == 0) {
+            Log.d("WARNING", "User does not exist");
+            return;
+        }
+        
+        database.delete(DatabaseHelper.USER_TABLE, DatabaseHelper.USER_USER_ID + " = '" + uniqueID + "';", null);
     }
 
     public static void initObjectsFromDB() {
