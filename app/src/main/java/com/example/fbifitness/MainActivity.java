@@ -16,6 +16,8 @@ import android.widget.EditText;
 import com.example.fbifitness.databinding.ActivityMainBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.util.Locale;
+
 public class MainActivity extends AppCompatActivity {
 
     public Fragment communityFragment = new CommunityFragment();
@@ -23,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     public Fragment newWorkoutFragment = new NewWorkoutFragment();
     public Fragment badgeFragment = new BadgeFragment();
     public Fragment profileFragment = new ProfileFragment();
+    //public Fragment loginFragment = new LoginFragment();
     public Toolbar toolbar;
 
     static DataManager dbManager;
@@ -94,5 +97,38 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frame_layout, fragment);
         fragmentTransaction.commit();
+    }
+
+    private String getFragmentName() {
+        // log to console
+        Log.d("Fragment Name", getSupportFragmentManager().findFragmentById(R.id.frame_layout).getClass().getSimpleName());
+        return getSupportFragmentManager().findFragmentById(R.id.frame_layout).getClass().getSimpleName();
+    }
+
+    private void setToolbarTitle() {
+        String fName = getFragmentName().toLowerCase(Locale.ROOT);
+        switch(fName) {
+            case "communityfragment":
+                toolbar.setTitle("Community");
+                break;
+            case "reportsfragment":
+                toolbar.setTitle("Reports");
+                break;
+            case "newworkoutfragment":
+                toolbar.setTitle("Workout");
+                break;
+            case "badgefragment":
+                toolbar.setTitle("Badges");
+                break;
+            case "profilefragment":
+                toolbar.setTitle("Profile");
+                break;
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setToolbarTitle(); // Set toolbar title to current fragment, won't work when switching fragments as this is executed on another thread
     }
 }

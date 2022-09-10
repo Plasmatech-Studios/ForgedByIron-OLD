@@ -75,14 +75,14 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_profile, container, false);
-        insertButton = (Button) view.findViewById(R.id.btnInsert);
-        fetchButton = (Button) view.findViewById(R.id.btnFetch);
-        etUserID = (EditText) view.findViewById(R.id.eTUniqueID);
-        etUsername = (EditText) view.findViewById(R.id.eTName);
-        etSecret = (EditText) view.findViewById(R.id.eTSecret);
-
-        insertButton.setOnClickListener(this);
-        fetchButton.setOnClickListener(this);
+//        insertButton = (Button) view.findViewById(R.id.btnInsert);
+//        fetchButton = (Button) view.findViewById(R.id.btnFetch);
+//        etUserID = (EditText) view.findViewById(R.id.eTUniqueID);
+//        etUsername = (EditText) view.findViewById(R.id.eTName);
+//        etSecret = (EditText) view.findViewById(R.id.eTSecret);
+//
+//        insertButton.setOnClickListener(this);
+//        fetchButton.setOnClickListener(this);
 
 
         return  view;
@@ -90,15 +90,15 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        switch ( (v.getId())) {
-            case R.id.btnInsert:
-                DataManager.insertUser(etUserID.getText().toString(), etUsername.getText().toString(), etSecret.getText().toString());
-                break;
-            case R.id.btnFetch:
-                DataManager.deleteUser(etUserID.getText().toString());
-                break;
-
-        }
+//        switch ( (v.getId())) {
+//            case R.id.btnInsert:
+//                DataManager.insertUser(etUserID.getText().toString(), etUsername.getText().toString(), etSecret.getText().toString());
+//                break;
+//            case R.id.btnFetch:
+//                DataManager.deleteUser(etUserID.getText().toString());
+//                break;
+//
+//        }
     }
 
 //    public void btnInsert(View v) {
