@@ -2,19 +2,25 @@ package com.example.fbifitness;
 
 import java.util.ArrayList;
 
-public class ExerciseListView {
+public class ExerciseListView implements Config {
     public String exerciseName;
     public boolean exerciseComplete;
+    public ExerciseType exerciseType;
     public ArrayList<SetListView> setList;
+    public Exercise exercise;
 
 
-    public ExerciseListView(String exerciseName) {
-        this.exerciseName = exerciseName;
+    public ExerciseListView(Exercise exercise) {
+        this.exercise = exercise;
+        this.exerciseName = exercise.getExerciseName();
+        this.exerciseType = exercise.getExerciseType();
         this.exerciseComplete = false;
         this.setList = new ArrayList<SetListView>();
-        this.addSet("10", "100");
-        this.addSet("1", "200");
 
+    }
+
+    public Exercise getExercise() {
+        return exercise;
     }
 
 
@@ -49,6 +55,10 @@ public class ExerciseListView {
 
     public void addSet(String reps, String weight) {
         this.setList.add(new SetListView(reps, weight));
+    }
+
+    public void replaceSet(int index, String reps, String weight) {
+        this.setList.set(index, new SetListView(reps, weight));
     }
 
 }

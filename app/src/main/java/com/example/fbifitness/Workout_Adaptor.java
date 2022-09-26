@@ -42,7 +42,7 @@ public class Workout_Adaptor extends RecyclerView.Adapter<Workout_Adaptor.MyView
         // get position
         int position = parent.getChildCount();
         RecyclerView setRecyclerView = view.findViewById(R.id.currentExerciseSetList);
-        Exercise_Adaptor exercise_adaptor = new Exercise_Adaptor(context, exerciseList.get(position).getSetList()); // not passing the correct set list
+        Exercise_Adaptor exercise_adaptor = new Exercise_Adaptor(context, exerciseList.get(position).getSetList(), exerciseList.get(position).getExercise(), exercise_adaptors.size()); // not passing the correct set list
         setRecyclerView.setAdapter(exercise_adaptor);
         setRecyclerView.setLayoutManager(new LinearLayoutManager(context));
         exercise_adaptors.add(exercise_adaptor);
@@ -88,9 +88,6 @@ public class Workout_Adaptor extends RecyclerView.Adapter<Workout_Adaptor.MyView
                     }
                 }});
 
-//            exerciseSets = itemView.findViewById(R.id.exerciseSetsRecycler);
-//            exerciseCompleteSwitch = itemView.findViewById(R.id.exerciseCompleteSwitch);
-//            addSetButton = itemView.findViewById(R.id.addSetButton);
         }
     }
 }

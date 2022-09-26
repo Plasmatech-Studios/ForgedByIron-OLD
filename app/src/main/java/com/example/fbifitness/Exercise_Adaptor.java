@@ -16,11 +16,15 @@ public class Exercise_Adaptor extends RecyclerView.Adapter<Exercise_Adaptor.MyVi
     Context context;
     ArrayList<SetListView> setList; // Dummy data, will be replaced with workout objects
     ArrayList<TextView> editSetButtons;
+    Exercise exercise;
+    int adaptorPosition;
 
 
-    public Exercise_Adaptor(Context context, ArrayList<SetListView> setList) {
+    public Exercise_Adaptor(Context context, ArrayList<SetListView> setList, Exercise exercise, int adaptorPosition) {
         this.context = context;
         this.setList = setList;
+        this.exercise = exercise;
+        this.adaptorPosition = adaptorPosition;
         editSetButtons = new ArrayList<TextView>();
     }
 
@@ -32,17 +36,18 @@ public class Exercise_Adaptor extends RecyclerView.Adapter<Exercise_Adaptor.MyVi
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.exercise_set_entry, parent, false);
 
-        // get position
-        int position = parent.getChildCount();
+
         TextView editSetButton = view.findViewById(R.id.EditSetText);
         editSetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setList.get(position).setSetWeight("500");
-                setList.get(position).setSetReps("100");
-                Log.d("setList", setList.get(position).getSetWeight());
-                //notify the adapter that the data has changed
-                notifyDataSetChanged();
+                int position = parent.getChildCount();
+                CurrentWorkoutFragment.editSet(position- 1, exercise, adaptorPosition); // TODO NOT WORKING - POSITION DATA
+//                setList.get(position).setSetWeight("500");
+//                setList.get(position).setSetReps("100");
+//                Log.d("setList", setList.get(position).getSetWeight());
+//                //notify the adapter that the data has changed
+//                notifyDataSetChanged();
             }});
         editSetButtons.add(editSetButton);
         return new MyViewHolder(view);

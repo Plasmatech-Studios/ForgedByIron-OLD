@@ -63,4 +63,9 @@ public interface Config {
         WEIGHT,
         TIME
     }
+
+    public enum ExerciseType {
+        WEIGHT,
+        TIME
+    }
 }

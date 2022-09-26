@@ -2,185 +2,310 @@ package com.example.fbifitness;
 
 import java.util.ArrayList;
 import java.sql.Date;
+import java.util.HashMap;
 
-public class Workout implements Config, Saveable {
-    public UniqueID userID;
-    //private User user; // Use getUser()
-    public UniqueID workoutID;
-    public UniqueID createdByID; // TODO handle this
-    public ArrayList<UniqueID> exercises = new ArrayList<UniqueID>();
-    public ActivityState state;
-    public boolean modified;
-    public Date timeStarted;
-    public Date timeCompleted;
-    public Date totalTime;
+public class Workout extends UniqueID implements Config, Saveable {
 
-    public Workout(UniqueID userID) {
-        this.timeStarted = new Date(System.currentTimeMillis());
-        this.userID = userID;
-        User user = UniqueID.getUserByID(this.userID);
-        this.workoutID = new UniqueID(IDType.WORKOUT, user, this);
-        this.state = ActivityState.NOT_STARTED;
-        this.modified = false;
+    private UniqueID userID;
+    // created by
+    private String workoutName;
+    private ActivityState state;
+    // modified
+    private Date timeStarted;
+    private Date timeCompleted;
+    private Date totalTime;
+
+    public static HashMap<String, Workout> workouts = new HashMap<String, Workout>(); // UniqueID, Workout
+
+    public static Workout newWorkout(UniqueID userID) {
+        Workout workout = new Workout(userID);
+        workout.workoutName = "New Workout";
+        workouts.put(workout.getUniqueID().toString(), workout);
+        return workout;       
     }
 
-    // public Workout(User user) {
+    public static Workout newWorkout(UniqueID userID, String workoutName) {
+        Workout workout = new Workout(userID);
+        workout.workoutName = workoutName;
+        workouts.put(workout.getUniqueID().toString(), workout);
+        return workout;
+    }
+
+    public static Workout newWorkoutFromLoad(String uniqueID, String userIDString, String workoutName, ActivityState state, Date timeStarted, Date timeCompleted, Date totalTime) {
+        if (workouts.containsKey(uniqueID)) {
+            return workouts.get(uniqueID);
+        }
+        if (!User.users.containsKey(userIDString)) { // Create a new User if it doesn't exist
+            User.newUserFromLoad(userIDString, "test", "test"); // TODO FIX
+        }
+        Workout workout = new Workout(uniqueID, userIDString, workoutName, state, timeStarted, timeCompleted, totalTime);
+        return workout;
+    }
+
+    private Workout(UniqueID userID) { // Constructor for creating new workout
+        super(IDType.WORKOUT);
+        this.userID = userID;
+        this.state = ActivityState.NOT_STARTED;
+        User.users.get(this.userID.toString()).setActiveWorkout(this.getUniqueID()); // Set the user's active workout to this workout
+
+    }
+
+    private Workout(String uniqueID, String userID, String workoutName, ActivityState state, Date timeStarted, Date timeCompleted, Date totalTime) { // Constructor for loading in data
+        super(uniqueID, IDType.WORKOUT);
+        this.userID = UniqueID.getUniqueIDFromString(userID);
+        this.workoutName = workoutName;
+        this.state = state;
+        this.timeStarted = timeStarted;
+        this.timeCompleted = timeCompleted;
+        this.totalTime = totalTime;
+    }
+
+    public void startWorkout() {
+        this.state = ActivityState.IN_PROGRESS;
+        this.timeStarted = new Date(System.currentTimeMillis());
+        if (User.users.get(this.userID.toString()).getActiveWorkout() != null) { // If the user has an active workout, complete it
+            Workout.workouts.get(User.users.get(this.userID.toString()).getActiveWorkout().toString()).completeWorkout();
+        }
+        User.users.get(this.userID.toString()).setActiveWorkout(this.getUniqueID()); // Set the user's active workout to this workout
+    }
+
+    public void completeWorkout() {
+        this.state = ActivityState.COMPLETED;
+        this.timeCompleted = new Date(System.currentTimeMillis());
+        for (Exercise exercise : Exercise.exercises.values()) {
+            if (exercise.getWorkoutID().toString().equals(this.getUniqueID().toString())) {
+                exercise.complete();;
+            }
+        }
+        this.totalTime = new Date(this.timeCompleted.getTime() - this.timeStarted.getTime());
+        User.users.get(this.userID.toString()).setActiveWorkout(null); // Set the user's active workout to null
+    }
+
+    public UniqueID addExercise(ExerciseType type) {
+        Exercise exercise = Exercise.newExercise(this.getUniqueID(), type);
+        return exercise.getUniqueID();
+    }
+
+    public UniqueID addExercise(ExerciseType type, String name) {
+        Exercise exercice = Exercise.newExercise(this.getUniqueID(), type, name);
+        return exercice.getUniqueID();
+    }
+
+    public void setName(String name) {
+        this.workoutName = name;
+    }
+
+    public String getName() {
+        return this.workoutName;
+    }
+
+    public ActivityState getState() {
+        return this.state;
+    }
+
+    public Date getTimeStarted() {
+        return this.timeStarted;
+    }
+
+    public Date getTimeCompleted() {
+        return this.timeCompleted;
+    }
+
+    public Date getTotalTime() {
+        return this.totalTime;
+    }
+
+    public UniqueID getUserID() {
+        return this.userID;
+    }
+
+    public User getUser() {
+        return User.users.get(this.userID.toString());
+    }
+
+
+    @Override
+    public void save() {
+        // TODO Auto-generated method stub
+
+    }
+    // public UniqueID userID;
+    // //private User user; // Use getUser()
+    // public UniqueID workoutID;
+    // public UniqueID createdByID; // TODO handle this
+    // public ArrayList<UniqueID> exercises = new ArrayList<UniqueID>();
+    // public ActivityState state;
+    // public boolean modified;
+    // public Date timeStarted;
+    // public Date timeCompleted;
+    // public Date totalTime;
+
+    // public Workout(UniqueID userID) {
     //     this.timeStarted = new Date(System.currentTimeMillis());
-    //     this.userID = user.getID();
-    //     this.user = user;
+    //     this.userID = userID;
+    //     User user = UniqueID.getUserByID(this.userID);
     //     this.workoutID = new UniqueID(IDType.WORKOUT, user, this);
     //     this.state = ActivityState.NOT_STARTED;
     //     this.modified = false;
     // }
 
-    // Constructor for loading in data
-    public Workout(UniqueID userID, UniqueID workoutID) {
-        this.workoutID = workoutID;
-        this.userID = userID;
-        User user = UniqueID.getUserByID(userID);
-        user.importWorkoutFromDB(this.workoutID);
-        this.getWorkoutValuesFromDB();
-        // TODO - Some function to put in a queue to populate
-    }
+    // // public Workout(User user) {
+    // //     this.timeStarted = new Date(System.currentTimeMillis());
+    // //     this.userID = user.getID();
+    // //     this.user = user;
+    // //     this.workoutID = new UniqueID(IDType.WORKOUT, user, this);
+    // //     this.state = ActivityState.NOT_STARTED;
+    // //     this.modified = false;
+    // // }
 
-    public void getWorkoutValuesFromDB() {
-        // TODO - Get values from DB
-    }
+    // // Constructor for loading in data
+    // public Workout(UniqueID userID, UniqueID workoutID) {
+    //     this.workoutID = workoutID;
+    //     this.userID = userID;
+    //     User user = UniqueID.getUserByID(userID);
+    //     user.importWorkoutFromDB(this.workoutID);
+    //     this.getWorkoutValuesFromDB();
+    //     // TODO - Some function to put in a queue to populate
+    // }
 
-    public UniqueID getID() {
-        return this.workoutID;
-    }
+    // public void getWorkoutValuesFromDB() {
+    //     // TODO - Get values from DB
+    // }
 
-    public UniqueID addExercise() {
-        if (this.state == ActivityState.COMPLETED) {
-            // Send message to ensure user knows workout is completed - this will flag as modified
-            this.modified = true;
-            this.state = ActivityState.IN_PROGRESS;
-        }
-        if (this.state == ActivityState.NOT_STARTED) {
-            this.state = ActivityState.IN_PROGRESS;
-        }
+    // public UniqueID getID() {
+    //     return this.workoutID;
+    // }
 
-        this.exercises.add(new Exercise(this.workoutID).exerciseID);
-        System.out.println("Exercise added");
-        return this.exercises.get(this.exercises.size() - 1);
-    }
+    // public UniqueID addExercise() {
+    //     if (this.state == ActivityState.COMPLETED) {
+    //         // Send message to ensure user knows workout is completed - this will flag as modified
+    //         this.modified = true;
+    //         this.state = ActivityState.IN_PROGRESS;
+    //     }
+    //     if (this.state == ActivityState.NOT_STARTED) {
+    //         this.state = ActivityState.IN_PROGRESS;
+    //     }
 
-    public void editExercise() {
-        if (this.state == ActivityState.COMPLETED) {
-            // Send message to ensure user knows workout is completed - this will flag as modified
-            this.modified = true;
-            this.state = ActivityState.IN_PROGRESS;
-        }
-        if (this.state == ActivityState.NOT_STARTED) {
-            this.state = ActivityState.IN_PROGRESS;
-            System.out.println("Exercise editted from NOT_STARTED workout");
+    //     this.exercises.add(new Exercise(this.workoutID).exerciseID);
+    //     System.out.println("Exercise added");
+    //     return this.exercises.get(this.exercises.size() - 1);
+    // }
 
-        }
-        // TODO Edit code here - may need to pass data
-    }
+    // public void editExercise() {
+    //     if (this.state == ActivityState.COMPLETED) {
+    //         // Send message to ensure user knows workout is completed - this will flag as modified
+    //         this.modified = true;
+    //         this.state = ActivityState.IN_PROGRESS;
+    //     }
+    //     if (this.state == ActivityState.NOT_STARTED) {
+    //         this.state = ActivityState.IN_PROGRESS;
+    //         System.out.println("Exercise editted from NOT_STARTED workout");
 
-    public void deleteExercise() {
-        if (this.state == ActivityState.COMPLETED) {
-            // Send message to ensure user knows workout is completed - this will flag as modified
-            this.modified = true;
-            this.state = ActivityState.IN_PROGRESS;
-        }
-        if (this.state == ActivityState.NOT_STARTED) { // Should not be in this state
-            this.state = ActivityState.IN_PROGRESS;
-            System.out.println("Exercise deleted from NOT_STARTED workout");
-        }
-        // TODO Edit code here - how to we handle this
-    }
+    //     }
+    //     // TODO Edit code here - may need to pass data
+    // }
 
-    public User getUser() {
-        return UniqueID.getUserByID(this.userID);
-    }
+    // public void deleteExercise() {
+    //     if (this.state == ActivityState.COMPLETED) {
+    //         // Send message to ensure user knows workout is completed - this will flag as modified
+    //         this.modified = true;
+    //         this.state = ActivityState.IN_PROGRESS;
+    //     }
+    //     if (this.state == ActivityState.NOT_STARTED) { // Should not be in this state
+    //         this.state = ActivityState.IN_PROGRESS;
+    //         System.out.println("Exercise deleted from NOT_STARTED workout");
+    //     }
+    //     // TODO Edit code here - how to we handle this
+    // }
 
-    @Override
-    public void save() {
-        if (User.mainUser == UniqueID.getUserByID(this.userID)) {
-            for (UniqueID exerciseID : this.exercises) {
-                Exercise exercise = (Exercise)UniqueID.getLinked(exerciseID);
-                exercise.save();
-            }
-        }
+    // public User getUser() {
+    //     return UniqueID.getUserByID(this.userID);
+    // }
+
+    // @Override
+    // public void save() {
+    //     if (User.mainUser == UniqueID.getUserByID(this.userID)) {
+    //         for (UniqueID exerciseID : this.exercises) {
+    //             Exercise exercise = (Exercise)UniqueID.getLinked(exerciseID);
+    //             exercise.save();
+    //         }
+    //     }
         
-    }
+    // }
 
-    public boolean completeWorkout() {
-        if (this.state == ActivityState.IN_PROGRESS) {
-            if (this.exercises.size() > 0) {
-                for (UniqueID exerciseID : this.exercises) {
-                    Exercise exercise = (Exercise) UniqueID.getLinked(exerciseID);
-                    if (exercise.state != ActivityState.COMPLETED) {
-                        // if all sets in the exercise are completed, complete the exercise
-                        if (exercise.hasOutstandingSets()) {
-                            deleteExercise(exerciseID); // deleting unfinished exercises before completing workout
-                        } else {
-                            exercise.completeExercise();
-                        }
+    // public boolean completeWorkout() {
+    //     if (this.state == ActivityState.IN_PROGRESS) {
+    //         if (this.exercises.size() > 0) {
+    //             for (UniqueID exerciseID : this.exercises) {
+    //                 Exercise exercise = (Exercise) UniqueID.getLinked(exerciseID);
+    //                 if (exercise.state != ActivityState.COMPLETED) {
+    //                     // if all sets in the exercise are completed, complete the exercise
+    //                     if (exercise.hasOutstandingSets()) {
+    //                         deleteExercise(exerciseID); // deleting unfinished exercises before completing workout
+    //                     } else {
+    //                         exercise.completeExercise();
+    //                     }
 
-                        if (this.exercises.size() > 0) {
-                            continue; // Check needed incase last exercise was removed
-                        } else {
-                            this.state = ActivityState.COMPLETED;
-                            this.timeCompleted = new Date(System.currentTimeMillis());
-                            this.totalTime = new Date(this.timeCompleted.getTime() - this.timeStarted.getTime());
-                            return true;
-                        }
-                    }
-                }
-                this.state = ActivityState.COMPLETED;
-                this.timeCompleted = new Date(System.currentTimeMillis());
-                this.totalTime = new Date(this.timeCompleted.getTime() - this.timeStarted.getTime());
-                //this.modified = true;
-                return true;
-            } else {
-                System.out.println("Error: Workout has no exercises");
-                return false;
-            }
-        } else {
-            System.out.println("Error: Workout cannot be completed");
-            return false;
-        }
-    }
+    //                     if (this.exercises.size() > 0) {
+    //                         continue; // Check needed incase last exercise was removed
+    //                     } else {
+    //                         this.state = ActivityState.COMPLETED;
+    //                         this.timeCompleted = new Date(System.currentTimeMillis());
+    //                         this.totalTime = new Date(this.timeCompleted.getTime() - this.timeStarted.getTime());
+    //                         return true;
+    //                     }
+    //                 }
+    //             }
+    //             this.state = ActivityState.COMPLETED;
+    //             this.timeCompleted = new Date(System.currentTimeMillis());
+    //             this.totalTime = new Date(this.timeCompleted.getTime() - this.timeStarted.getTime());
+    //             //this.modified = true;
+    //             return true;
+    //         } else {
+    //             System.out.println("Error: Workout has no exercises");
+    //             return false;
+    //         }
+    //     } else {
+    //         System.out.println("Error: Workout cannot be completed");
+    //         return false;
+    //     }
+    // }
 
-    public boolean deleteExercise(UniqueID exerciseID) {
-        //Exercise exercise = (Exercise) UniqueID.getLinked(exerciseID);
-        if (this.state == ActivityState.COMPLETED) {
-            // Send message to ensure user knows workout is completed - this will flag as modified
-            this.modified = true;
-            this.state = ActivityState.IN_PROGRESS;
-        }
-        if (this.state == ActivityState.NOT_STARTED) { // Should not be in this state
-            this.state = ActivityState.IN_PROGRESS;
-            System.out.println("Exercise deleted from NOT_STARTED workout");
-        }
-        // if exercise is in workout, remove it
-        if (this.exercises.contains(exerciseID)) {
-            this.exercises.remove(exerciseID);
-            System.out.println("Exercise deleted");
-            return true;
-        } else {
-            return false;
-        }
-    }
+    // public boolean deleteExercise(UniqueID exerciseID) {
+    //     //Exercise exercise = (Exercise) UniqueID.getLinked(exerciseID);
+    //     if (this.state == ActivityState.COMPLETED) {
+    //         // Send message to ensure user knows workout is completed - this will flag as modified
+    //         this.modified = true;
+    //         this.state = ActivityState.IN_PROGRESS;
+    //     }
+    //     if (this.state == ActivityState.NOT_STARTED) { // Should not be in this state
+    //         this.state = ActivityState.IN_PROGRESS;
+    //         System.out.println("Exercise deleted from NOT_STARTED workout");
+    //     }
+    //     // if exercise is in workout, remove it
+    //     if (this.exercises.contains(exerciseID)) {
+    //         this.exercises.remove(exerciseID);
+    //         System.out.println("Exercise deleted");
+    //         return true;
+    //     } else {
+    //         return false;
+    //     }
+    // }
 
-    public long getWorkoutDurationMillis() {
-        return this.totalTime.getTime();
-    }
+    // public long getWorkoutDurationMillis() {
+    //     return this.totalTime.getTime();
+    // }
 
-    public long getWorkoutDurationSeconds() {
-        return this.totalTime.getTime() / 1000;
-    }
+    // public long getWorkoutDurationSeconds() {
+    //     return this.totalTime.getTime() / 1000;
+    // }
 
-    public long getWorkoutDurationMinutes() {
-        return this.totalTime.getTime() / 1000 / 60;
-    }
+    // public long getWorkoutDurationMinutes() {
+    //     return this.totalTime.getTime() / 1000 / 60;
+    // }
 
-    public void importExerciseFromDB(UniqueID exerciseID) {
-        this.exercises.add(exerciseID);
-    }
+    // public void importExerciseFromDB(UniqueID exerciseID) {
+    //     this.exercises.add(exerciseID);
+    // }
 
 }

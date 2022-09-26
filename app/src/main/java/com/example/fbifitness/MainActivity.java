@@ -21,7 +21,7 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static ArrayList<ExerciseListView> exerciseList;
+    //public static ArrayList<ExerciseListView> exerciseList;
 
 
     public Fragment communityFragment = new CommunityFragment();
@@ -106,13 +106,6 @@ public class MainActivity extends AppCompatActivity {
         sessionController = SessionController.getInstance();
         sessionController.startSession();
 
-        exerciseList = new ArrayList<ExerciseListView>();
-        exerciseList.add(new ExerciseListView("Bench Press"));
-        exerciseList.add(new ExerciseListView("Squat"));
-        exerciseList.add(new ExerciseListView("Deadlift"));
-        exerciseList.add(new ExerciseListView("Overhead Press"));
-        exerciseList.add(new ExerciseListView("Bicep Curl"));
-        exerciseList.add(new ExerciseListView("Tricep Extension"));
     }
 
     public void replaceFragment(Fragment fragment) {
