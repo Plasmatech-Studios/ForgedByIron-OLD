@@ -18,6 +18,7 @@ public class Exercise_Adaptor extends RecyclerView.Adapter<Exercise_Adaptor.MyVi
     ArrayList<TextView> editSetButtons;
     Exercise exercise;
     int adaptorPosition;
+    Exercise_Adaptor exercise_adaptor;
 
 
     public Exercise_Adaptor(Context context, ArrayList<SetListView> setList, Exercise exercise, int adaptorPosition) {
@@ -26,6 +27,7 @@ public class Exercise_Adaptor extends RecyclerView.Adapter<Exercise_Adaptor.MyVi
         this.exercise = exercise;
         this.adaptorPosition = adaptorPosition;
         editSetButtons = new ArrayList<TextView>();
+        this.exercise_adaptor = this;
     }
 
 
@@ -42,12 +44,7 @@ public class Exercise_Adaptor extends RecyclerView.Adapter<Exercise_Adaptor.MyVi
             @Override
             public void onClick(View v) {
                 int position = parent.getChildCount();
-                CurrentWorkoutFragment.editSet(position- 1, exercise, adaptorPosition); // TODO NOT WORKING - POSITION DATA
-//                setList.get(position).setSetWeight("500");
-//                setList.get(position).setSetReps("100");
-//                Log.d("setList", setList.get(position).getSetWeight());
-//                //notify the adapter that the data has changed
-//                notifyDataSetChanged();
+                CurrentWorkoutFragment.editSet(position- 1, exercise, exercise_adaptor); // TODO NOT WORKING - POSITION DATA
             }});
         editSetButtons.add(editSetButton);
         return new MyViewHolder(view);
@@ -57,7 +54,7 @@ public class Exercise_Adaptor extends RecyclerView.Adapter<Exercise_Adaptor.MyVi
     public void onBindViewHolder(@NonNull Exercise_Adaptor.MyViewHolder holder, int position) {
         // Assigning values to each row in the workout_exercise_entry layout
         // Based on the position of the row
-        holder.setNumber.setText("Set " + position);
+        holder.setNumber.setText("Set " + (position + 1));
         holder.setReps.setText(setList.get(position).getSetReps());
         holder.setWeight.setText(setList.get(position).getSetWeight() + " kg");
     }
@@ -75,7 +72,6 @@ public class Exercise_Adaptor extends RecyclerView.Adapter<Exercise_Adaptor.MyVi
         TextView setWeight;
         TextView setReps;
         TextView newSetButton;
-        // Add a button for edit set later
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);

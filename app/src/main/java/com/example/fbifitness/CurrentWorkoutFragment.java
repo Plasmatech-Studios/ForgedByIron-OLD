@@ -21,6 +21,7 @@ import android.widget.TextView;
 public class CurrentWorkoutFragment extends Fragment implements Exercise_Interface, Config {
 
     private static View myView;
+    private static Exercise_Adaptor adaptor;
 
     static TextView addExerciseButton;
     static Workout_Adaptor workout_adaptor;
@@ -92,6 +93,7 @@ public class CurrentWorkoutFragment extends Fragment implements Exercise_Interfa
 
         // Set up the input
         final EditText input = new EditText(myView.getContext());
+        input.setHint(prompt);
 
         input.setInputType(InputType.TYPE_NUMBER_VARIATION_NORMAL);
         builder.setView(input);
@@ -117,6 +119,7 @@ public class CurrentWorkoutFragment extends Fragment implements Exercise_Interfa
 
                 // Set up the input
                 final EditText input = new EditText(myView.getContext());
+                input.setHint(prompt);
 
                 input.setInputType(InputType.TYPE_NUMBER_VARIATION_NORMAL);
                 builder.setView(input);
@@ -151,8 +154,8 @@ public class CurrentWorkoutFragment extends Fragment implements Exercise_Interfa
         builder.show();
     }
 
-    public static void editSet(int position, Exercise exercise, int adaptorPosition) {
-
+    public static void editSet(int position, Exercise exercise, Exercise_Adaptor exercise_adaptor) {
+        adaptor = exercise_adaptor;
         User user = SessionController.currentUser;
         Workout workout = Workout.workouts.get(user.getActiveWorkout().toString());
 
@@ -207,10 +210,14 @@ public class CurrentWorkoutFragment extends Fragment implements Exercise_Interfa
                         }
 
                         Set set = new Set(exercise.getExerciseType(), weightTime, repsDistance);
+                        Log.d(exercise.getSets().get(position).reps, set.toString());
                         exercise.replaceSet(position, set);
+                        Log.d(exercise.getSets().get(position).reps, set.toString());
 
-                        SessionController.exerciseList.get(adaptorPosition).replaceSet(position, repsDistance, weightTime);
-                        workout_adaptor.exercise_adaptors.get(adaptorPosition).notifyDataSetChanged();
+
+                        adaptor.setList.get(position).setSetWeight(weightTime);
+                        adaptor.setList.get(position).setSetReps(repsDistance);
+                        adaptor.notifyDataSetChanged();
                     }
                 });
                 builder.show();
@@ -238,8 +245,8 @@ public class CurrentWorkoutFragment extends Fragment implements Exercise_Interfa
 
         // Set up the input
         final EditText input = new EditText(view.getContext());
-
         input.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+        input.setHint("Exercise Name");
         builder.setView(input);
 
         // Set up the buttons
@@ -247,6 +254,9 @@ public class CurrentWorkoutFragment extends Fragment implements Exercise_Interfa
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String exerciseName = input.getText().toString();
+                if (exerciseName.equals("")) {
+                    exerciseName = "New Exercise";
+                }
                 User user = SessionController.currentUser;
                 Workout workout = Workout.workouts.get(user.getActiveWorkout().toString());
                 UniqueID exerciseID = workout.addExercise(Config.ExerciseType.WEIGHT, exerciseName);

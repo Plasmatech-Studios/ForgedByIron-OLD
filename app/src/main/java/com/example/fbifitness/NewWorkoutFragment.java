@@ -107,6 +107,7 @@ public class NewWorkoutFragment extends Fragment {
         final EditText input = new EditText(view.getContext());
 
         input.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+        input.setHint("Workout Name");
         builder.setView(input);
 
         // Set up the buttons
@@ -114,6 +115,9 @@ public class NewWorkoutFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String workoutName = input.getText().toString();
+                if (workoutName.equals("")) {
+                    workoutName = "New Workout";
+                }
                 SessionController.getInstance().requestNewWorkout(workoutName);
                 MainActivity.mainActivity.replaceFragment(new CurrentWorkoutFragment());
             }
