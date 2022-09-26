@@ -16,20 +16,28 @@ import android.widget.EditText;
 import com.example.fbifitness.databinding.ActivityMainBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
+
+    public static ArrayList<ExerciseListView> exerciseList;
+
 
     public Fragment communityFragment = new CommunityFragment();
     public Fragment reportsFragment = new ReportsFragment();
     public Fragment newWorkoutFragment = new NewWorkoutFragment();
     public Fragment badgeFragment = new BadgeFragment();
     public Fragment profileFragment = new ProfileFragment();
+    public Fragment currentWorkoutFragment = new CurrentWorkoutFragment();
     //public Fragment loginFragment = new LoginFragment();
     public Toolbar toolbar;
 
     static DataManager dbManager;
     static ActivityMainBinding binding;
+    static MainActivity mainActivity;
+    static SessionController sessionController;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+
 
         // Setup default page
         BottomNavigationView bottomNavigationView;
@@ -90,9 +100,22 @@ public class MainActivity extends AppCompatActivity {
             }
             return true;
         });
+
+        mainActivity = this;
+
+        sessionController = SessionController.getInstance();
+        sessionController.startSession();
+
+        exerciseList = new ArrayList<ExerciseListView>();
+        exerciseList.add(new ExerciseListView("Bench Press"));
+        exerciseList.add(new ExerciseListView("Squat"));
+        exerciseList.add(new ExerciseListView("Deadlift"));
+        exerciseList.add(new ExerciseListView("Overhead Press"));
+        exerciseList.add(new ExerciseListView("Bicep Curl"));
+        exerciseList.add(new ExerciseListView("Tricep Extension"));
     }
 
-    private void replaceFragment(Fragment fragment) {
+    public void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frame_layout, fragment);

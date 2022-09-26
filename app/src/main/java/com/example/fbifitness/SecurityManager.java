@@ -1,5 +1,7 @@
 package com.example.fbifitness;
 
+import android.util.Log;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.nio.charset.StandardCharsets;
@@ -10,46 +12,65 @@ import java.util.HashMap;
 
 public class SecurityManager implements Config {
 
-    private static HashMap<String, UniqueID> usernameMap = new HashMap<String, UniqueID>();
-    private static HashMap<UniqueID, String> passwordMap = new HashMap<UniqueID, String>();
+    private static HashMap<String, UniqueID> usernameMap;
+    private static HashMap<UniqueID, String> passwordMap;
 
-    public static void main(String args[])  throws NoSuchAlgorithmException {
-        String username = "admin";
-        String password = "password";
-        createUser(username, password);
-        System.out.println("Created user " + username + " with password " + password);
-        User testLogin = login(username, (password));
-        if (testLogin == null) {
-            System.out.println("Error: Login failed");
-            return;
-        } else {
-            System.out.println("Logged in as " + testLogin.username);
+    //Singleton
+    private static SecurityManager instance = null;
 
-        }
-        Date date = new Date(System.currentTimeMillis());
-        testLogin.createWorkout();
-        testLogin.getCurrentWorkout().addExercise();
-        ((Exercise)(UniqueID.getLinked(testLogin.getCurrentWorkout().exercises.get(0)))).addSet(SetType.WEIGHT, 100.0f, 5);
-        ((Exercise)(UniqueID.getLinked(testLogin.getCurrentWorkout().exercises.get(0)))).addSet(SetType.WEIGHT, 100.0f, 5);
-        ((Exercise)(UniqueID.getLinked(testLogin.getCurrentWorkout().exercises.get(0)))).addSet(SetType.WEIGHT, 100.0f, 5);
-        ((Exercise)(UniqueID.getLinked(testLogin.getCurrentWorkout().exercises.get(0)))).completeAllSets();
-        testLogin.completeWorkout();
-        Date date2 = new Date(System.currentTimeMillis());
-        System.out.println("Workout started at " + date.getTime() + " and completed at " + date2.getTime());
-        System.out.println("Workout duration: " + (date2.getTime() - date.getTime()) + " milliseconds");
-        System.out.println("Workout duration: " + ((Workout)UniqueID.getLinked(testLogin.workoutHistory.get(0))).getWorkoutDurationMillis() + " milliseconds");
-        //testLogin.workoutHistory.get(0).exercises.get(0).sets.get(0).setWeight(100.0f);
-        //saveUserData();
+    private SecurityManager() {
+        // Exists only to defeat instantiation.
     }
+    public static SecurityManager getInstance() {
+        if(instance == null) {
+            instance = new SecurityManager();
+        }
+        return instance;
+    }
+
+    public static void init() {
+        if (usernameMap == null) {
+            usernameMap = new HashMap<String, UniqueID>();
+        }
+        if (passwordMap == null) {
+            passwordMap = new HashMap<UniqueID, String>();
+        }
+    }
+//    public static void main(String args[])  throws NoSuchAlgorithmException {
+//        String username = "admin";
+//        String password = "password";
+//        createUser(username, password);
+//        System.out.println("Created user " + username + " with password " + password);
+//        User testLogin = login(username, (password));
+//        if (testLogin == null) {
+//            System.out.println("Error: Login failed");
+//            return;
+//        } else {
+//            System.out.println("Logged in as " + testLogin.username);
+//
+//        }
+//        Date date = new Date(System.currentTimeMillis());
+//        testLogin.createWorkout();
+//        testLogin.getCurrentWorkout().addExercise();
+//        ((Exercise)(UniqueID.getLinked(testLogin.getCurrentWorkout().exercises.get(0)))).addSet(SetType.WEIGHT, 100.0f, 5);
+//        ((Exercise)(UniqueID.getLinked(testLogin.getCurrentWorkout().exercises.get(0)))).addSet(SetType.WEIGHT, 100.0f, 5);
+//        ((Exercise)(UniqueID.getLinked(testLogin.getCurrentWorkout().exercises.get(0)))).addSet(SetType.WEIGHT, 100.0f, 5);
+//        ((Exercise)(UniqueID.getLinked(testLogin.getCurrentWorkout().exercises.get(0)))).completeAllSets();
+//        testLogin.completeWorkout();
+//        Date date2 = new Date(System.currentTimeMillis());
+//        System.out.println("Workout started at " + date.getTime() + " and completed at " + date2.getTime());
+//        System.out.println("Workout duration: " + (date2.getTime() - date.getTime()) + " milliseconds");
+//        System.out.println("Workout duration: " + ((Workout)UniqueID.getLinked(testLogin.workoutHistory.get(0))).getWorkoutDurationMillis() + " milliseconds");
+//        //testLogin.workoutHistory.get(0).exercises.get(0).sets.get(0).setWeight(100.0f);
+//        //saveUserData();
+//    }
 
     public static User createUser(String username, String password) throws NoSuchAlgorithmException {
         if (usernameMap.containsKey(username)) {
-            System.out.println("Error: Username already exists");
+            Log.d("SecurityManager", "Error: Username already exists");
             return null;
         }
         String hashedPassword = hashString(password);
-        //User user = new User(username, hashedPassword);
-        //User.mainUser = user;
         User.mainUser = new User(username, hashedPassword);
         UniqueID userID = User.mainUser.userID;
         usernameMap.put(username, userID);
@@ -75,10 +96,15 @@ public class SecurityManager implements Config {
 
 
     public static String hashString(String password) throws NoSuchAlgorithmException {
-        MessageDigest digest = MessageDigest.getInstance("SHA3-256");
+
+        // add salt
+        String SALT = "FBI_Fitness";
+        password = password + SALT;
+        MessageDigest digest = MessageDigest.getInstance("SHA-384");
         byte[] hashbytes = digest.digest(
           password.getBytes(StandardCharsets.UTF_8));
         String sha3Hex = bytesToHex(hashbytes);
+        Log.d("SecurityManager", "Hashed password: " + sha3Hex);
         return sha3Hex;
     }
 

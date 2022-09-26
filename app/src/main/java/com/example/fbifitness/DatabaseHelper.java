@@ -7,7 +7,7 @@ import android.util.Log;
 
 public class DatabaseHelper extends SQLiteOpenHelper implements Config {
 
-    static final String LOCAL_DB_NAME = "Test6.db";
+    static final String LOCAL_DB_NAME = "FBI.db";
     static final int LOCAL_DB_VERSION = 1;
 
 
@@ -127,7 +127,27 @@ public class DatabaseHelper extends SQLiteOpenHelper implements Config {
 
 
     public DatabaseHelper(Context context) {
+
         super(context, LOCAL_DB_NAME , null, LOCAL_DB_VERSION);
+
+//        // drop the database if it exists
+//        context.deleteDatabase("FBI.db");
+//        context.deleteDatabase("FBI.db-journal");
+//
+//        context.deleteDatabase("Forged.db");
+//        context.deleteDatabase("Forged.db-journal");
+//
+//        context.deleteDatabase("Test3.db");
+//        context.deleteDatabase("Test3.db-journal");
+//
+//        context.deleteDatabase("Test4.db");
+//        context.deleteDatabase("Test4.db-journal");
+//
+//        context.deleteDatabase("Test5.db");
+//        context.deleteDatabase("Test5.db-journal");
+//
+//        context.deleteDatabase("Test6.db");
+//        context.deleteDatabase("Test6.db-journal");
     }
 
 
