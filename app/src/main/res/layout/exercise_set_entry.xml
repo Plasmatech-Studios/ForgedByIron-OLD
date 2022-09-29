@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" >
+
+        <!-- Wrapper -->
+        <RelativeLayout
+            android:id="@+id/setLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+            <!--            Title-->
+            <LinearLayout
+                android:id="@+id/setTitleLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/setNumberText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginLeft="50dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginRight="50dp"
+                        android:padding="5dp"
+                        android:text="Set 1"
+                        android:textAlignment="center"
+                        android:textColor="@color/black"
+                        android:textSize="24dp"
+                        android:textStyle="bold" />
+
+<!--                    placeholder for the edit button-->
+                    <TextView
+                        android:id="@+id/EditSetText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginLeft="15dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginRight="15dp"
+                        android:background="@drawable/text_border_red"
+                        android:padding="5dp"
+                        android:text="EDIT"
+                        android:textAlignment="center"
+                        android:textColor="@color/white"
+                        android:textSize="30dp"
+                        android:textStyle="bold"/>
+
+                </RelativeLayout>
+            </LinearLayout>
+
+
+
+            <!--Set-->
+            <LinearLayout
+                android:id="@+id/setAreaLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/setTitleLayout"
+                android:orientation="vertical">
+
+                <!-- Weight -->
+                <LinearLayout
+                    android:id="@+id/weightLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="50dp"
+                    android:layout_marginTop="25dp"
+                    android:layout_marginRight="50dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/weightText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="10dp"
+                        android:text="Weight:"
+                        android:ems="3"
+                        android:textColor="@color/black"
+                        android:textSize="24dp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/setWeightText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="10dp"
+                        android:ems="5"
+                        android:inputType="numberDecimal"
+                        android:text="100kg"
+                        android:textColor="@color/black"
+                        android:textSize="24dp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Reps -->
+                <LinearLayout
+                    android:id="@+id/repsLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="50dp"
+                    android:layout_marginTop="25dp"
+                    android:layout_marginBottom="25dp"
+                    android:layout_marginRight="50dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/repsText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="10dp"
+                        android:text="Reps:"
+                        android:ems="3"
+                        android:textColor="@color/black"
+                        android:textSize="24dp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/setRepsText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="10dp"
+                        android:ems="5"
+                        android:inputType="numberDecimal"
+                        android:text="5"
+                        android:textColor="@color/black"
+                        android:textSize="24dp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+            </LinearLayout>
+        </RelativeLayout>
+
+
+    </androidx.cardview.widget.CardView>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
