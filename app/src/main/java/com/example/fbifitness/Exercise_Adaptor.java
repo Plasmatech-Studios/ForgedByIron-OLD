@@ -38,13 +38,13 @@ public class Exercise_Adaptor extends RecyclerView.Adapter<Exercise_Adaptor.MyVi
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.exercise_set_entry, parent, false);
 
-
+        int setPosition = parent.getChildCount();
         TextView editSetButton = view.findViewById(R.id.EditSetText);
         editSetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int position = parent.getChildCount();
-                CurrentWorkoutFragment.editSet(position- 1, exercise, exercise_adaptor); // TODO NOT WORKING - POSITION DATA
+                int exercisePosition = parent.getChildCount();
+                CurrentWorkoutFragment.editSet(exercisePosition - 1, exercise, exercise_adaptor, setPosition); // TODO NOT WORKING - POSITION DATA
             }});
         editSetButtons.add(editSetButton);
         return new MyViewHolder(view);

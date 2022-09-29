@@ -1,5 +1,6 @@
 package com.example.fbifitness;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
@@ -13,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -94,8 +96,7 @@ public class CurrentWorkoutFragment extends Fragment implements Exercise_Interfa
         // Set up the input
         final EditText input = new EditText(myView.getContext());
         input.setHint(prompt);
-
-        input.setInputType(InputType.TYPE_NUMBER_VARIATION_NORMAL);
+        input.setInputType(InputType.TYPE_CLASS_NUMBER);
         builder.setView(input);
 
         // Set up the buttons
@@ -120,8 +121,7 @@ public class CurrentWorkoutFragment extends Fragment implements Exercise_Interfa
                 // Set up the input
                 final EditText input = new EditText(myView.getContext());
                 input.setHint(prompt);
-
-                input.setInputType(InputType.TYPE_NUMBER_VARIATION_NORMAL);
+                input.setInputType(InputType.TYPE_CLASS_NUMBER);
                 builder.setView(input);
 
                 // Set up the buttons
@@ -154,7 +154,7 @@ public class CurrentWorkoutFragment extends Fragment implements Exercise_Interfa
         builder.show();
     }
 
-    public static void editSet(int position, Exercise exercise, Exercise_Adaptor exercise_adaptor) {
+    public static void editSet(int position, Exercise exercise, Exercise_Adaptor exercise_adaptor, int setIndex) {
         adaptor = exercise_adaptor;
         User user = SessionController.currentUser;
         Workout workout = Workout.workouts.get(user.getActiveWorkout().toString());
@@ -166,20 +166,20 @@ public class CurrentWorkoutFragment extends Fragment implements Exercise_Interfa
             prompt = "Enter time (seconds)";
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(myView.getContext());
-
         builder.setTitle(prompt);
-
         // Set up the input
         final EditText input = new EditText(myView.getContext());
-
-        input.setInputType(InputType.TYPE_NUMBER_VARIATION_NORMAL);
+        // only allow numbers
+        input.setInputType(InputType.TYPE_CLASS_NUMBER);
+        // focus on the input
+        input.requestFocus();
+        // set the text hint to the current weight
+        input.setHint(exercise.getSets().get(setIndex).weight);
         builder.setView(input);
-
         // Set up the buttons
         builder.setPositiveButton(prompt, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
                 weightTime = input.getText().toString();
                 if (weightTime.equals("")) {
                     weightTime = "0";
@@ -191,13 +191,14 @@ public class CurrentWorkoutFragment extends Fragment implements Exercise_Interfa
                     prompt = "Enter distance (meters)";
                 }
                 AlertDialog.Builder builder = new AlertDialog.Builder(myView.getContext());
-
                 builder.setTitle(prompt);
 
                 // Set up the input
                 final EditText input = new EditText(myView.getContext());
-
-                input.setInputType(InputType.TYPE_NUMBER_VARIATION_NORMAL);
+                input.setInputType(InputType.TYPE_CLASS_NUMBER);
+                input.requestFocus();
+                //imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+                input.setHint(exercise.getSets().get(setIndex).reps);
                 builder.setView(input);
 
                 // Set up the buttons
@@ -210,24 +211,30 @@ public class CurrentWorkoutFragment extends Fragment implements Exercise_Interfa
                         }
 
                         Set set = new Set(exercise.getExerciseType(), weightTime, repsDistance);
-                        Log.d(exercise.getSets().get(position).reps, set.toString());
-                        exercise.replaceSet(position, set);
-                        Log.d(exercise.getSets().get(position).reps, set.toString());
+                        Log.d(exercise.getSets().get(setIndex).reps, set.toString());
+                        exercise.replaceSet(setIndex, set);
+                        Log.d(exercise.getSets().get(setIndex).reps, set.toString());
 
-
-                        adaptor.setList.get(position).setSetWeight(weightTime);
-                        adaptor.setList.get(position).setSetReps(repsDistance);
+                        adaptor.setList.get(setIndex).setSetWeight(weightTime);
+                        adaptor.setList.get(setIndex).setSetReps(repsDistance);
                         adaptor.notifyDataSetChanged();
                     }
                 });
+
+                builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
                 builder.show();
             }
         });
         builder.setNegativeButton("back", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-
+                dialog.dismiss();
             }
         });
 
