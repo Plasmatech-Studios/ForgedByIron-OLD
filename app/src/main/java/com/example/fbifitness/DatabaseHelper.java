@@ -103,7 +103,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements Config {
                 USER_USER_ID + " TEXT PRIMARY KEY NOT NULL, " +
                 USER_USERNAME + " TEXT NOT NULL, " +
                 USER_SECRET_KEY + " TEXT NOT NULL, " +
-                USER_ACTIVE_WORKOUT + " TEXT NOT NULL, " +
+                USER_ACTIVE_WORKOUT + " TEXT, " +
                 "FOREIGN KEY (" + USER_USERNAME + ") REFERENCES " + LOGIN_TABLE + " (" + LOGIN_USERNAME + "), " +
                 "FOREIGN KEY (" + USER_USER_ID + ") REFERENCES " + AUTH_TABLE + " (" + AUTH_USER_ID + "), " +
                 "FOREIGN KEY (" + USER_ACTIVE_WORKOUT + ") REFERENCES " + WORKOUT_TABLE + " (" + WORKOUT_WORKOUT_ID + "), " +
@@ -117,9 +117,9 @@ public class DatabaseHelper extends SQLiteOpenHelper implements Config {
                 WORKOUT_WORKOUT_NAME + " TEXT NOT NULL, " +
                 WORKOUT_STATE + " TEXT NOT NULL, " +
                 //WORKOUT_MODIFIED + " INT NOT NULL, " +
-                WORKOUT_TIME_STARTED + " REAL NOT NULL, " +
-                WORKOUT_TIME_COMPLETED + " REAL NOT NULL, " +
-                WORKOUT_TOTAL_TIME + " REAL NOT NULL, " +
+                WORKOUT_TIME_STARTED + " TEXT, " +
+                WORKOUT_TIME_COMPLETED + " TEXT, " +
+                WORKOUT_TOTAL_TIME + " TEXT, " +
                 "FOREIGN KEY (" + WORKOUT_USER_ID + ") REFERENCES " + USER_TABLE + " (" + USER_USER_ID + "));"; // +
                 //"FOREIGN KEY (" + WORKOUT_CREATED_BY_ID + ") REFERENCES " + USER_TABLE + " (" + USER_USER_ID + "));";
 
@@ -132,10 +132,10 @@ public class DatabaseHelper extends SQLiteOpenHelper implements Config {
 //              EXERCISE_USER_ID + " TEXT NOT NULL, " +
 //              EXERCISE_CREATED_BY_ID + " TEXT NOT NULL, " +
                 EXERCISE_STATE + " TEXT NOT NULL, " +
-                EXERCISE_TIME_STARTED + " REAL NOT NULL, " +
-                EXERCISE_TIME_COMPLETED + " REAL NOT NULL, " +
-                EXERCISE_TOTAL_TIME + " REAL NOT NULL, " +
-                EXERCISE_SET_DATA + " TEXT NOT NULL, " +
+                EXERCISE_TIME_STARTED + " TEXT, " +
+                EXERCISE_TIME_COMPLETED + " TEXT, " +
+                EXERCISE_TOTAL_TIME + " TEXT, " +
+                EXERCISE_SET_DATA + " TEXT, " +
                 "FOREIGN KEY (" + EXERCISE_WORKOUT_ID + ") REFERENCES " + WORKOUT_TABLE + " (" + WORKOUT_WORKOUT_ID + "));"; // +
 //              "FOREIGN KEY (" + EXERCISE_EXERCISE_TYPE_ID + ") REFERENCES " + EXERCISE_TYPE_TABLE + " (" + EXERCISE_EXERCISE_TYPE_ID + "), " +
 //              "FOREIGN KEY (" + EXERCISE_USER_ID + ") REFERENCES " + USER_TABLE + " (" + USER_USER_ID + "), " +

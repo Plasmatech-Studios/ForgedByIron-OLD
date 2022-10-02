@@ -1,6 +1,6 @@
 package com.example.fbifitness;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -54,7 +54,8 @@ public class Exercise extends UniqueID implements Config, Saveable {
         this.workoutID = workoutID;
         this.exerciseType = exerciseType;
         this.exerciseName = exerciseName;
-        this.state = ActivityState.NOT_STARTED;
+        this.state = ActivityState.IN_PROGRESS;
+        this.timeStarted = new Date(System.currentTimeMillis());
     }
 
     private Exercise(String workoutID, String exerciseID, ActivityState state, ExerciseType exerciseType, String exerciseName, ArrayList<Set> sets, Date timeStarted, Date timeCompleted, Date totalTime) { // Create a new exercise from the Database
@@ -72,20 +73,33 @@ public class Exercise extends UniqueID implements Config, Saveable {
     public void start() {
         this.state = ActivityState.IN_PROGRESS;
         this.timeStarted = new Date(System.currentTimeMillis());
+        save();
     }
 
     public void complete() {
         this.state = ActivityState.COMPLETED;
-        this.timeCompleted = new Date(System.currentTimeMillis());
-        this.totalTime = new Date(this.timeCompleted.getTime() - this.timeStarted.getTime());
+        if (this.timeStarted != null) {
+            this.timeCompleted = new Date(System.currentTimeMillis());
+            this.totalTime = new Date(this.timeCompleted.getTime() - this.timeStarted.getTime());
+        }
+        save();
+    }
+
+    public void unComplete() {
+        this.state = ActivityState.IN_PROGRESS;
+        this.timeCompleted = null;
+        this.totalTime = null;
+        save();
     }
 
     public void addSet(Set set) {
         this.sets.add(set);
+        save();
     }
 
     public void addSet(ExerciseType setType, String reps, String weightTime) {
         this.sets.add(new Set(setType, reps, weightTime));
+        this.save();
     }
 
     public void completeSet(int index) {
@@ -153,6 +167,7 @@ public class Exercise extends UniqueID implements Config, Saveable {
 
     public void replaceSet(int index, Set set) {
         this.sets.set(index, set);
+        this.save();
     }
 
 
@@ -160,8 +175,7 @@ public class Exercise extends UniqueID implements Config, Saveable {
 
     @Override
     public void save() {
-        // TODO Auto-generated method stub
-
+        DataManager.saveExercise(this.getUniqueID().toString());
     }
     // public UniqueID createdByID;
     // public UniqueID workoutID;

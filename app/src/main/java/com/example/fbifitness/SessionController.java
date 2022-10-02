@@ -29,7 +29,9 @@ public class SessionController implements Config {
 
     public void startSession() {
         currentUser = User.newUser("test", "test");
-        System.out.println(currentUser.getUniqueID());
+        DataManager.saveNewUser(currentUser.getUniqueID().toString(), currentUser.getUsername(), currentUser.getSecretKey());
+        Log.d("Starting Sessions with User: ", currentUser.getUniqueID().toString());
+        requestNewWorkout("Test Workout");
         // securityManager = SecurityManager.getInstance();
         // securityManager.init();
         // // if already logged in, do other things
@@ -50,10 +52,14 @@ public class SessionController implements Config {
     public void requestNewWorkout(String workoutName) {
         if (currentUser != null) {
             UniqueID workoutID = currentUser.startNewWorkout();
+            //Log.d activityState
             Log.d("SessionController", "New workout created: " + workoutID.toString());
             Workout workout = Workout.workouts.get(workoutID.toString());
+            Log.d("SessionController", "Workout state: " + workout.getState().toString());
             workout.setName(workoutName);
+            workout.startWorkout();
             exerciseList = new ArrayList<ExerciseListView>();
+            workout.save();
         } else {
             Log.d("SessionController", "No user logged in");
         }

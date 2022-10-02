@@ -1,7 +1,10 @@
 package com.example.fbifitness;
 
+import android.util.Log;
+
 import java.util.ArrayList;
-import java.sql.Date;
+//import Date
+import java.util.Date;
 import java.util.HashMap;
 
 public class Workout extends UniqueID implements Config, Saveable {
@@ -45,8 +48,11 @@ public class Workout extends UniqueID implements Config, Saveable {
     private Workout(UniqueID userID) { // Constructor for creating new workout
         super(IDType.WORKOUT);
         this.userID = userID;
+        this.workoutName = "New Workout";
         this.state = ActivityState.NOT_STARTED;
-        User.users.get(this.userID.toString()).setActiveWorkout(this.getUniqueID()); // Set the user's active workout to this workout
+        this.timeStarted = null;
+        this.timeCompleted = null;
+        this.totalTime = null;
 
     }
 
@@ -63,21 +69,24 @@ public class Workout extends UniqueID implements Config, Saveable {
     public void startWorkout() {
         this.state = ActivityState.IN_PROGRESS;
         this.timeStarted = new Date(System.currentTimeMillis());
-        if (User.users.get(this.userID.toString()).getActiveWorkout() != null) { // If the user has an active workout, complete it
-            Workout.workouts.get(User.users.get(this.userID.toString()).getActiveWorkout().toString()).completeWorkout();
-        }
-        User.users.get(this.userID.toString()).setActiveWorkout(this.getUniqueID()); // Set the user's active workout to this workout
+//        if (User.users.get(this.userID.toString()).getActiveWorkout() != null) { // If the user has an active workout, complete it
+//            Workout.workouts.get(User.users.get(this.userID.toString()).getActiveWorkout().toString()).completeWorkout();
+//        }
+//        User.users.get(this.userID.toString()).setActiveWorkout(this.getUniqueID()); // Set the user's active workout to this workout
     }
 
     public void completeWorkout() {
         this.state = ActivityState.COMPLETED;
+        Log.d("Workout", "Workout " + this.getUniqueID().toString() + " completed");
         this.timeCompleted = new Date(System.currentTimeMillis());
         for (Exercise exercise : Exercise.exercises.values()) {
             if (exercise.getWorkoutID().toString().equals(this.getUniqueID().toString())) {
                 exercise.complete();;
             }
         }
-        this.totalTime = new Date(this.timeCompleted.getTime() - this.timeStarted.getTime());
+        if (this.getTimeStarted() != null && this.getTimeCompleted() != null) {
+            this.totalTime = new Date(this.getTimeCompleted().getTime() - this.getTimeStarted().getTime());
+        }
         User.users.get(this.userID.toString()).setActiveWorkout(null); // Set the user's active workout to null
     }
 
@@ -126,8 +135,7 @@ public class Workout extends UniqueID implements Config, Saveable {
 
     @Override
     public void save() {
-        // TODO Auto-generated method stub
-
+        DataManager.saveWorkout(this.getUniqueID().toString());
     }
     // public UniqueID userID;
     // //private User user; // Use getUser()

@@ -56,8 +56,6 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-
-
         // Setup default page
         BottomNavigationView bottomNavigationView;
         bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottomNavigationView);

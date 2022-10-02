@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import java.sql.SQLDataException;
+import java.util.Date;
 
 public class DataManager implements Config {
     private DatabaseHelper dbHelper;
@@ -89,7 +90,7 @@ public class DataManager implements Config {
         database.insert(DatabaseHelper.AUTH_TABLE, null, contentValues);
     }
 
-    public static void insertUser(String inUserID, String inUsername, String inSecretKey) {
+    public static void insertUser(String inUserID, String inUsername, String inSecretKey, String activeWorkoutID) {
         //Ensure a user with the same ID does not already exist using select count
         String countQuery = "SELECT * FROM " + DatabaseHelper.USER_TABLE + " WHERE " + DatabaseHelper.USER_USER_ID + " = '" + inUserID + "';";
         Cursor cursor = database.rawQuery(countQuery, null);
@@ -102,8 +103,19 @@ public class DataManager implements Config {
         contentValues.put("userID", inUserID);
         contentValues.put("username", inUsername);
         contentValues.put("secretKey", inSecretKey);
+        if (activeWorkoutID != null) {
+            contentValues.put("activeWorkout", activeWorkoutID);
+        } else {
+            contentValues.putNull("activeWorkout");
+        }
 
         database.insert(DatabaseHelper.USER_TABLE, null, contentValues);
+    }
+
+    public static void saveNewUser(String inUserID, String inUsername, String inSecretKey) {
+        insertUser(inUserID, inUsername, inSecretKey, null);
+        insertAuth(inUserID, inSecretKey);
+        insertLogin(inUsername, inUserID);
     }
 
 //   public static void insertWorkout(String inWorkoutID, String inUserID, String inCreatedByID,
@@ -236,6 +248,173 @@ public class DataManager implements Config {
         
         database.delete(DatabaseHelper.USER_TABLE, DatabaseHelper.USER_USER_ID + " = '" + uniqueID + "';", null);
     }
+
+    public static void saveWorkout(String workoutID) {
+        // Ensure workout exists
+        String countQuery = "SELECT * FROM " + DatabaseHelper.WORKOUT_TABLE + " WHERE " + DatabaseHelper.WORKOUT_WORKOUT_ID + " = '" + workoutID + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() == 0) {
+            Log.d("WARNING", "Workout does not exist");
+            //return;
+        }
+
+        // get the workout
+        Workout workout = Workout.workouts.get(workoutID);
+        String userID = workout.getUserID().toString();
+        String workoutName = workout.getName();
+        String state = workout.getState().toString();
+        String timeStarted;
+        String timeCompleted;
+        String totalTime;
+
+        if (workout.getTimeStarted() != null) {
+            timeStarted = String.valueOf(workout.getTimeStarted().getTime());
+        } else {
+            timeStarted = null;
+        }
+
+        if (workout.getTimeCompleted() != null) {
+            timeCompleted = String.valueOf(workout.getTimeCompleted().getTime());
+        } else {
+            timeCompleted = null;
+        }
+
+        if (workout.getTotalTime() != null) {
+            totalTime = String.valueOf(workout.getTotalTime().getTime());
+        } else {
+            totalTime = null;
+        }
+
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(DatabaseHelper.WORKOUT_USER_ID, userID);
+        contentValues.put(DatabaseHelper.WORKOUT_WORKOUT_NAME, workoutName);
+        contentValues.put(DatabaseHelper.WORKOUT_STATE, state);
+        contentValues.put(DatabaseHelper.WORKOUT_TIME_STARTED, timeStarted);
+        contentValues.put(DatabaseHelper.WORKOUT_TIME_COMPLETED, timeCompleted);
+        contentValues.put(DatabaseHelper.WORKOUT_TOTAL_TIME, totalTime);
+
+        if (cursor.getCount() == 0) {
+            contentValues.put(DatabaseHelper.WORKOUT_WORKOUT_ID, workoutID);
+            // insert
+            database.insert(DatabaseHelper.WORKOUT_TABLE, null, contentValues);
+            Log.d("INFO", "Workout inserted");
+        } else {
+            // update
+            database.update(DatabaseHelper.WORKOUT_TABLE, contentValues, DatabaseHelper.WORKOUT_WORKOUT_ID + " = '" + workoutID + "';", null);
+        }
+        //database.update(DatabaseHelper.WORKOUT_TABLE, contentValues, DatabaseHelper.WORKOUT_WORKOUT_ID + " = '" + workoutID + "';", null);
+
+    }
+
+    public static void saveExercise(String exerciseID) {
+        // Ensure exercise exists
+        String countQuery = "SELECT * FROM " + DatabaseHelper.EXERCISE_TABLE + " WHERE " + DatabaseHelper.EXERCISE_EXERCISE_ID + " = '" + exerciseID + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() == 0) {
+            Log.d("WARNING", "Exercise does not exist");
+            //return;
+        }
+
+        // get the exercise
+        Exercise exercise = Exercise.exercises.get(exerciseID);
+        String workoutID = exercise.getWorkoutID().toString();
+        String name = exercise.getExerciseName();
+        String exerciseTypeID = exercise.getExerciseType().toString();
+        String state = exercise.getState().toString();
+        String timeStarted;
+        String timeCompleted;
+        String totalTime;
+
+        String setData;
+        StringBuilder builder = new StringBuilder();
+        for (Set set : exercise.getSets()) {
+            builder.append(set.reps);
+            builder.append(",");
+            if (set.weight != null) {
+                builder.append(set.weight);
+            } else{
+                builder.append(set.timeSeconds);
+            }
+            builder.append(",");
+            if (set.state != null) {
+                builder.append(set.state);
+            } else {
+                builder.append("null");
+            }
+            builder.append(";");
+        }
+        // remove last ;
+        if (builder.length() > 0) {
+            builder.deleteCharAt(builder.length() - 1);
+            setData = builder.toString();
+        } else {
+            setData = null;
+        }
+
+
+        if (exercise.getTimeStarted() != null) {
+            timeStarted = String.valueOf(exercise.getTimeStarted().getTime());
+        } else {
+            timeStarted = null;
+        }
+
+        if (exercise.getTimeCompleted() != null) {
+            timeCompleted = String.valueOf(exercise.getTimeCompleted().getTime());
+        } else {
+            timeCompleted = null;
+        }
+
+        if (exercise.getTotalTime() != null) {
+            totalTime = String.valueOf(exercise.getTotalTime().getTime());
+        } else {
+            totalTime = null;
+        }
+
+
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(DatabaseHelper.EXERCISE_WORKOUT_ID, workoutID);
+        contentValues.put(DatabaseHelper.EXERCISE_NAME_ID, name);
+        contentValues.put(DatabaseHelper.EXERCISE_EXERCISE_TYPE_ID, exerciseTypeID);
+        contentValues.put(DatabaseHelper.EXERCISE_STATE, state);
+        contentValues.put(DatabaseHelper.EXERCISE_TIME_STARTED, timeStarted);
+        contentValues.put(DatabaseHelper.EXERCISE_TIME_COMPLETED, timeCompleted);
+        contentValues.put(DatabaseHelper.EXERCISE_TOTAL_TIME, totalTime);
+        contentValues.put(DatabaseHelper.EXERCISE_SET_DATA, setData);
+
+        if (cursor.getCount() == 0) {
+            contentValues.put(DatabaseHelper.EXERCISE_EXERCISE_ID, exerciseID);
+            // insert
+            database.insert(DatabaseHelper.EXERCISE_TABLE, null, contentValues);
+            Log.d("INFO", "Exercise inserted");
+        } else {
+            // update
+            database.update(DatabaseHelper.EXERCISE_TABLE, contentValues, DatabaseHelper.EXERCISE_EXERCISE_ID + " = '" + exerciseID + "';", null);
+        }
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //     public static void initObjectsFromDB() {
 //         initUniqueIDsFromDB();
