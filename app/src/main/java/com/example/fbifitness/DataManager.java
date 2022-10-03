@@ -23,8 +23,8 @@ public class DataManager implements Config {
         database = dbHelper.getWritableDatabase();
         dropAllTables();
         createTables();
-        database.execSQL("DROP TABLE IF EXISTS USER;"); // TODO Remove before production);
-        database.execSQL(DatabaseHelper.CREATE_LOCAL_USER_TABLE_QUERY);
+        //database.execSQL("DROP TABLE IF EXISTS USER;"); // TODO Remove before production);
+        //database.execSQL(DatabaseHelper.CREATE_LOCAL_USER_TABLE_QUERY);
 
         //database.execSQL(DatabaseHelper.CREATE_LOCAL_USER_TABLE_QUERY);
 
@@ -48,8 +48,8 @@ public class DataManager implements Config {
     }
 
     private void createTables() {
-        database.execSQL(DatabaseHelper.CREATE_LOCAL_AUTH_TABLE_QUERY);
-        database.execSQL(DatabaseHelper.CREATE_LOCAL_LOGIN_TABLE_QUERY);
+        //database.execSQL(DatabaseHelper.CREATE_LOCAL_AUTH_TABLE_QUERY);
+        //database.execSQL(DatabaseHelper.CREATE_LOCAL_LOGIN_TABLE_QUERY);
         database.execSQL(DatabaseHelper.CREATE_LOCAL_USER_TABLE_QUERY);
         database.execSQL(DatabaseHelper.CREATE_LOCAL_WORKOUT_TABLE_QUERY);
         database.execSQL(DatabaseHelper.CREATE_LOCAL_EXERCISE_TABLE_QUERY);
@@ -58,46 +58,46 @@ public class DataManager implements Config {
         Log.d("WARNING", "ALL TABLES CREATED");
     }
 
-    public static void insertLogin(String inUsername, String inUserID) {
-        // Ensure a user with the same ID does not already exist using select count
-        String countQuery = "SELECT * FROM " + DatabaseHelper.LOGIN_TABLE + " WHERE " + DatabaseHelper.LOGIN_USER_ID + " = '" + inUserID + "';";
-        Cursor cursor = database.rawQuery(countQuery, null);
-        if (cursor.getCount() > 0) {
-            Log.d("WARNING", "User with that ID already exists");
-            return;
-        }
-            
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(DatabaseHelper.LOGIN_USERNAME, inUsername);
-        contentValues.put(DatabaseHelper.LOGIN_USER_ID, inUserID);
+//    public static void insertLogin(String inUsername, String inUserID) {
+//        // Ensure a user with the same ID does not already exist using select count
+//        String countQuery = "SELECT * FROM " + DatabaseHelper.LOGIN_TABLE + " WHERE " + DatabaseHelper.LOGIN_USER_ID + " = '" + inUserID + "';";
+//        Cursor cursor = database.rawQuery(countQuery, null);
+//        if (cursor.getCount() > 0) {
+//            Log.d("WARNING", "User with that ID already exists");
+//            return;
+//        }
+//
+//        ContentValues contentValues = new ContentValues();
+//        contentValues.put(DatabaseHelper.LOGIN_USERNAME, inUsername);
+//        contentValues.put(DatabaseHelper.LOGIN_USER_ID, inUserID);
+//
+//        database.insert(DatabaseHelper.LOGIN_TABLE, null, contentValues);
+//    }
 
-        database.insert(DatabaseHelper.LOGIN_TABLE, null, contentValues);
-    }
+//   public static void insertAuth(String inUserID, String inSecretKey) {
+//        // Ensure a user with the same ID does not already exist using select count
+//        String countQuery = "SELECT * FROM " + DatabaseHelper.AUTH_TABLE + " WHERE " + DatabaseHelper.AUTH_USER_ID + " = '" + inUserID + "';";
+//        Cursor cursor = database.rawQuery(countQuery, null);
+//        if (cursor.getCount() > 0) {
+//            Log.d("WARNING", "User with that ID already exists");
+//            return;
+//        }
+//
+//        ContentValues contentValues = new ContentValues();
+//        contentValues.put(DatabaseHelper.AUTH_USER_ID, inUserID);
+//        contentValues.put(DatabaseHelper.AUTH_SECRET_KEY, inSecretKey);
+//
+//        database.insert(DatabaseHelper.AUTH_TABLE, null, contentValues);
+//    }
 
-   public static void insertAuth(String inUserID, String inSecretKey) {
-        // Ensure a user with the same ID does not already exist using select count
-        String countQuery = "SELECT * FROM " + DatabaseHelper.AUTH_TABLE + " WHERE " + DatabaseHelper.AUTH_USER_ID + " = '" + inUserID + "';";
-        Cursor cursor = database.rawQuery(countQuery, null);
-        if (cursor.getCount() > 0) {
-            Log.d("WARNING", "User with that ID already exists");
-            return;
-        }
-        
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(DatabaseHelper.AUTH_USER_ID, inUserID);
-        contentValues.put(DatabaseHelper.AUTH_SECRET_KEY, inSecretKey);
-
-        database.insert(DatabaseHelper.AUTH_TABLE, null, contentValues);
-    }
-
-    public static void insertUser(String inUserID, String inUsername, String inSecretKey, String activeWorkoutID) {
+    public static void saveUser(String inUserID, String inUsername, String inSecretKey, String activeWorkoutID) {
         //Ensure a user with the same ID does not already exist using select count
         String countQuery = "SELECT * FROM " + DatabaseHelper.USER_TABLE + " WHERE " + DatabaseHelper.USER_USER_ID + " = '" + inUserID + "';";
         Cursor cursor = database.rawQuery(countQuery, null);
-        if (cursor.getCount() > 0) {
-            Log.d("WARNING", "User with that ID already exists");
-            return;
-        }
+//        if (cursor.getCount() > 0) {
+//            Log.d("WARNING", "User with that ID already exists");
+//            return;
+//        }
 
         ContentValues contentValues = new ContentValues();
         contentValues.put("userID", inUserID);
@@ -108,14 +108,60 @@ public class DataManager implements Config {
         } else {
             contentValues.putNull("activeWorkout");
         }
-
-        database.insert(DatabaseHelper.USER_TABLE, null, contentValues);
+        if (cursor.getCount() > 0) {
+            database.update(DatabaseHelper.USER_TABLE, contentValues, DatabaseHelper.USER_USER_ID + " = '" + inUserID + "';", null);
+        } else {
+            database.insert(DatabaseHelper.USER_TABLE, null, contentValues);
+        }
+        //database.insert(DatabaseHelper.USER_TABLE, null, contentValues);
     }
 
     public static void saveNewUser(String inUserID, String inUsername, String inSecretKey) {
-        insertUser(inUserID, inUsername, inSecretKey, null);
-        insertAuth(inUserID, inSecretKey);
-        insertLogin(inUsername, inUserID);
+        saveUser(inUserID, inUsername, inSecretKey, null);
+        //insertAuth(inUserID, inSecretKey);
+        //insertLogin(inUsername, inUserID);
+    }
+
+    // Check to see if a username exists in the local database
+    public static boolean findUsername(String username) {
+        String countQuery = "SELECT * FROM " + DatabaseHelper.USER_TABLE + " WHERE " + DatabaseHelper.USER_USERNAME + " = '" + username + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() == 0) {
+            return false;
+        }
+        return true;
+    }
+
+    // Get the userID of a user with a given username
+    public static String findUserIDFromUsername(String username) {
+        String countQuery = "SELECT userID FROM " + DatabaseHelper.USER_TABLE + " WHERE " + DatabaseHelper.USER_USERNAME + " = '" + username + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() == 0) {
+            return null;
+        }
+        try {
+            cursor.moveToFirst();
+            return cursor.getString(0);
+        } catch (Exception e) {
+            Log.d("WARNING", "Error finding user ID from username");
+            return null;
+        }
+    }
+
+    // Get the secretKey of a user with a given username and userID
+    public static String getAuthSecretKey(String username, String userID) {
+        String countQuery = "SELECT secretKey FROM " + DatabaseHelper.USER_TABLE + " WHERE " + DatabaseHelper.USER_USERNAME + " = '" + username + "' AND " + DatabaseHelper.USER_USER_ID + " = '" + userID + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() == 0) {
+            return null;
+        }
+        try {
+            cursor.moveToFirst();
+            return cursor.getString(0);
+        } catch (Exception e) {
+            Log.d("WARNING", "Error finding user ID from username");
+            return null;
+        }
     }
 
 //   public static void insertWorkout(String inWorkoutID, String inUserID, String inCreatedByID,
@@ -305,6 +351,12 @@ public class DataManager implements Config {
         }
         //database.update(DatabaseHelper.WORKOUT_TABLE, contentValues, DatabaseHelper.WORKOUT_WORKOUT_ID + " = '" + workoutID + "';", null);
 
+    }
+
+    public static int getWorkoutCount(String userID) {
+        String countQuery = "SELECT * FROM " + DatabaseHelper.WORKOUT_TABLE + " WHERE " + DatabaseHelper.WORKOUT_USER_ID + " = '" + userID + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        return cursor.getCount();
     }
 
     public static void saveExercise(String exerciseID) {

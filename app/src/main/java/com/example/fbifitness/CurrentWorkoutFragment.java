@@ -32,6 +32,7 @@ public class CurrentWorkoutFragment extends Fragment implements Exercise_Interfa
     private static String weightTime = "0";
     private static String repsDistance = "0";
     private static String prompt = "Prompt";
+    static TextView endWorkoutButton;
 
 
 
@@ -60,6 +61,7 @@ public class CurrentWorkoutFragment extends Fragment implements Exercise_Interfa
         workout_adaptor = new Workout_Adaptor(getContext(), SessionController.exerciseList, this);
         recyclerView.setAdapter(workout_adaptor);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
         addExerciseButton = view.findViewById(R.id.NewExerciseText);
         addExerciseButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,6 +69,16 @@ public class CurrentWorkoutFragment extends Fragment implements Exercise_Interfa
                 Log.d("CurrentWorkoutFragment", "Add Exercise Button Clicked");
                 //SessionController.getInstance().
                 addNewExercise(view);
+            }
+        });
+
+        endWorkoutButton = view.findViewById(R.id.EndWorkoutText);
+        endWorkoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) { // End Workout Button
+                Log.d("CurrentWorkoutFragment", "End Workout Button Clicked");
+                SessionController.getInstance().endWorkout();
+                //(view);
             }
         });
 

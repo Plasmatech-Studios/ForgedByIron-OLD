@@ -85,21 +85,21 @@ public class DatabaseHelper extends SQLiteOpenHelper implements Config {
             "DROP TABLE IF EXISTS " + EXERCISE_TYPE_TABLE + ";";
 
     static final String CREATE_LOCAL_LOGIN_TABLE_QUERY =
-        "CREATE TABLE " + LOGIN_TABLE +" (" +
+        "CREATE TABLE IF NOT EXISTS " + LOGIN_TABLE +" (" +
                 LOGIN_USERNAME + " TEXT PRIMARY KEY NOT NULL, " +
                 LOGIN_USER_ID + " TEXT NOT NULL, " +
                 "FOREIGN KEY (" + LOGIN_USER_ID + ") REFERENCES " + AUTH_TABLE + " (" + AUTH_USER_ID + "), " +
                 "FOREIGN KEY (" + LOGIN_USERNAME + ") REFERENCES " + USER_TABLE + " (" + USER_USERNAME + "));";
 
     static final String CREATE_LOCAL_AUTH_TABLE_QUERY =
-        "CREATE TABLE " + AUTH_TABLE + " (" +
+        "CREATE TABLE IF NOT EXISTS " + AUTH_TABLE + " (" +
                 AUTH_USER_ID + " TEXT PRIMARY KEY NOT NULL, " +
                 AUTH_SECRET_KEY + " TEXT NOT NULL, " +
                 "FOREIGN KEY (" + AUTH_USER_ID + ") REFERENCES " + USER_TABLE + " (" + USER_USER_ID + "), " +
                 "FOREIGN KEY (" + AUTH_SECRET_KEY + ") REFERENCES " + USER_TABLE + " (" + USER_SECRET_KEY + "));";
 
     static final String CREATE_LOCAL_USER_TABLE_QUERY =
-        "CREATE TABLE " + USER_TABLE + " (" +
+        "CREATE TABLE IF NOT EXISTS " + USER_TABLE + " (" +
                 USER_USER_ID + " TEXT PRIMARY KEY NOT NULL, " +
                 USER_USERNAME + " TEXT NOT NULL, " +
                 USER_SECRET_KEY + " TEXT NOT NULL, " +
@@ -110,7 +110,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements Config {
                 "FOREIGN KEY (" + USER_SECRET_KEY + ") REFERENCES " + AUTH_TABLE + " (" + AUTH_SECRET_KEY + "));";
 
     static final String CREATE_LOCAL_WORKOUT_TABLE_QUERY =
-        "CREATE TABLE " + WORKOUT_TABLE + " (" +
+        "CREATE TABLE IF NOT EXISTS " + WORKOUT_TABLE + " (" +
                 WORKOUT_WORKOUT_ID + " TEXT PRIMARY KEY NOT NULL, " +
                 WORKOUT_USER_ID + " TEXT NOT NULL, " +
                 //WORKOUT_CREATED_BY_ID + " TEXT NOT NULL, " +
@@ -124,7 +124,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements Config {
                 //"FOREIGN KEY (" + WORKOUT_CREATED_BY_ID + ") REFERENCES " + USER_TABLE + " (" + USER_USER_ID + "));";
 
     static final String CREATE_LOCAL_EXERCISE_TABLE_QUERY =
-        "CREATE TABLE " + EXERCISE_TABLE + " (" +
+        "CREATE TABLE IF NOT EXISTS " + EXERCISE_TABLE + " (" +
                 EXERCISE_EXERCISE_ID + " TEXT PRIMARY KEY NOT NULL, " +
                 EXERCISE_WORKOUT_ID + " TEXT NOT NULL, " +
                 EXERCISE_EXERCISE_TYPE_ID + " TEXT NOT NULL, " +

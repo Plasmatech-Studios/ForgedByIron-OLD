@@ -2,6 +2,7 @@ package com.example.fbifitness;
 
 import android.util.Log;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 public class SessionController implements Config {
@@ -28,26 +29,58 @@ public class SessionController implements Config {
     }
 
     public void startSession() {
-        currentUser = User.newUser("test", "test");
-        DataManager.saveNewUser(currentUser.getUniqueID().toString(), currentUser.getUsername(), currentUser.getSecretKey());
-        Log.d("Starting Sessions with User: ", currentUser.getUniqueID().toString());
-        requestNewWorkout("Test Workout");
-        // securityManager = SecurityManager.getInstance();
-        // securityManager.init();
-        // // if already logged in, do other things
+        securityManager = SecurityManager.getInstance();
+        login();
+        if (currentUser == null) {
+            Log.d("SessionController", "Error: Login failed");
+            try { // TODO DO NOT DEFAULT TO THIS - MOVE TO LOGIN ACTIVITY
+            securityManager.newUser("admin", "password");
+            } catch (NoSuchAlgorithmException e) {
+                Log.d("SessionController", "Error: NoSuchAlgorithmException");
+            }
+        } else {
+            Log.d("SessionController", "Logged in as " + currentUser.getUsername());
+        }
 
-        // try {
-        //     SecurityManager.createUser("admin", "password");
-        // } catch (Exception e) {
-        //     Log.d("SessionController", "Error creating user");
-        // }
+        requestNewWorkout("Chest");
+        MainActivity.bottomNavigationView.setSelectedItemId(R.id.profile);
 
-        // User.mainUser.createWorkout();
-        // User.mainUser.getCurrentWorkout().addExercise();
-        // ((Exercise)(UniqueID.getLinked(User.mainUser.getCurrentWorkout().exercises.get(0)))).addSet(SetType.WEIGHT, 100.0f, 5);
-        // ((Exercise)(UniqueID.getLinked(User.mainUser.getCurrentWorkout().exercises.get(0)))).addSet(SetType.WEIGHT, 100.0f, 5);
-        // ((Exercise)(UniqueID.getLinked(User.mainUser.getCurrentWorkout().exercises.get(0)))).addSet(SetType.WEIGHT, 100.0f, 5);
     }
+
+    private void login() {
+        String username = "admin";
+        User user;
+        try {
+            user = securityManager.login(username, "password");
+            if (user == null) {
+                Log.e("SessionController", "Error: Login failed");
+                return;
+            } else {
+                Log.i("SessionController", "Logged in as " + user.getUsername());
+                currentUser = user;
+            }
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String getActiveUserName() {
+        return currentUser.getUsername();
+    }
+
+    public int getActiveUserWorkoutCount() {
+        return currentUser.getWorkoutCount();
+    }
+
+
+
+
+        //currentUser = User.newUser(username, secretKey);
+        //DataManager.saveNewUser(currentUser.getUniqueID().toString(), currentUser.getUsername(), currentUser.getSecretKey());
+        //Log.d("Starting Sessions with User: ", currentUser.getUniqueID().toString());
+        //requestNewWorkout("Test Workout");
+
+    //}
 
     public void requestNewWorkout(String workoutName) {
         if (currentUser != null) {
@@ -60,6 +93,17 @@ public class SessionController implements Config {
             workout.startWorkout();
             exerciseList = new ArrayList<ExerciseListView>();
             workout.save();
+        } else {
+            Log.d("SessionController", "No user logged in");
+        }
+    }
+
+    public void endWorkout() {
+        if (currentUser != null) {
+            currentUser.endWorkout();
+            //Display the reports fragment
+            MainActivity.bottomNavigationView.setSelectedItemId(R.id.reports);
+
         } else {
             Log.d("SessionController", "No user logged in");
         }

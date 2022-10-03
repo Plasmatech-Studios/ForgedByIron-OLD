@@ -54,6 +54,7 @@ public class User extends UniqueID implements Config, Saveable {
 
     public UniqueID getActiveWorkout() {
         if (this.activeWorkout != null) {
+            Log.d("User", "Active workout: " + this.activeWorkout.toString());
             return this.activeWorkout.getUniqueID();
         } else {
             return null;
@@ -75,6 +76,7 @@ public class User extends UniqueID implements Config, Saveable {
         Log.d("User", "Creating new workout");
         Workout workout = Workout.newWorkout(this.getUniqueID());
         this.setActiveWorkout(workout.getUniqueID());
+        save();
         return workout.getUniqueID();
     }
 
@@ -89,15 +91,28 @@ public class User extends UniqueID implements Config, Saveable {
                 this.setActiveWorkout(null);
                 Workout workout = Workout.workouts.get(workoutID);
                 workout.save();
+                save();
                 Log.d("User", "Ending workout: " + workoutID);
                 return;
             }
         }
+        save();
+    }
+
+    public int getWorkoutCount() {
+        int count = 0;
+        count = DataManager.getWorkoutCount(this.getUniqueID().toString());
+        return count;
     }
 
 
     @Override
     public void save() {
+        if (this.activeWorkout != null) {
+            DataManager.saveUser(this.getUniqueID().toString(), this.username, this.secretKey, this.activeWorkout.toString());
+        } else {
+            DataManager.saveUser(this.getUniqueID().toString(), this.username, this.secretKey, null);
+        }
         // TODO Auto-generated method stub
 
     }

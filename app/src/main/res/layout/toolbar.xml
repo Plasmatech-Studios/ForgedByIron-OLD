@@ -8,11 +8,9 @@
     android:background="@color/redDark"
     android:elevation="4dp"
     android:textAlignment="center"
-
+    android:layout_centerHorizontal="true"
     android:gravity="center"
-
     android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-
     app:layout_anchorGravity="center">
 
 

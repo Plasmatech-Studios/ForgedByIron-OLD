@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     static ActivityMainBinding binding;
     static MainActivity mainActivity;
     static SessionController sessionController;
+    static BottomNavigationView bottomNavigationView;
 
 
     @Override
@@ -57,11 +58,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Setup default page
-        BottomNavigationView bottomNavigationView;
         bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setSelectedItemId(R.id.profile);
-        replaceFragment(profileFragment); // Replace this with login screen later
-        toolbar.setTitle("Profile");
         toolbar.setNavigationIcon(R.drawable.ic_baseline_qr_code_24);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,26 +71,33 @@ public class MainActivity extends AppCompatActivity {
 
 
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
-
+            Log.d("Bottom Nav", "Selected");
             switch(item.getItemId()) {
                 case R.id.community:
-                    toolbar.setTitle("Community");
                     replaceFragment(communityFragment);
                     break;
                 case R.id.reports:
-                    toolbar.setTitle("Reports");
                     replaceFragment(reportsFragment);
                     break;
                 case R.id.newWorkout:
-                    toolbar.setTitle("Workout");
-                    replaceFragment(newWorkoutFragment);
+                    if (sessionController.currentUser != null) {
+                        if (sessionController.currentUser.getActiveWorkout() == null) {
+                            Log.e("MainActivity", "Error: No active workout");
+                            replaceFragment(newWorkoutFragment);
+                        } else {
+                            Log.e("MainActivity", "Error: Active workout already exists");
+                            replaceFragment(currentWorkoutFragment);
+                        }
+                    } else {
+                        Log.e("MainActivity", "Error: No user logged in");
+                        // TODO LOGIN
+                    }
+
                     break;
                 case R.id.badges:
-                    toolbar.setTitle("Badges");
                     replaceFragment(badgeFragment);
                     break;
                 case R.id.profile:
-                    toolbar.setTitle("Profile");
                     replaceFragment(profileFragment);
                     break;
             }
@@ -111,31 +116,41 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frame_layout, fragment);
         fragmentTransaction.commit();
+        //Log the fragment name
+        String fragmentName = getFragmentName(fragment);
+        setToolbarTitle(fragmentName);
+
     }
 
-    private String getFragmentName() {
+    private String getFragmentName(Fragment fragment) {
         // log to console
-        Log.d("Fragment Name", getSupportFragmentManager().findFragmentById(R.id.frame_layout).getClass().getSimpleName());
-        return getSupportFragmentManager().findFragmentById(R.id.frame_layout).getClass().getSimpleName();
+        Log.d("Fragment Name", fragment.getClass().getSimpleName());
+        return fragment.getClass().getSimpleName();
     }
-
-    private void setToolbarTitle() {
-        String fName = getFragmentName().toLowerCase(Locale.ROOT);
-        switch(fName) {
-            case "communityfragment":
+//
+    private void setToolbarTitle(String fragmentName) {
+        switch(fragmentName) {
+            case "CommunityFragment":
                 toolbar.setTitle("Community");
                 break;
-            case "reportsfragment":
+            case "ReportsFragment":
                 toolbar.setTitle("Reports");
                 break;
-            case "newworkoutfragment":
+            case "NewWorkoutFragment":
                 toolbar.setTitle("Workout");
                 break;
-            case "badgefragment":
+            case "BadgeFragment":
                 toolbar.setTitle("Badges");
                 break;
-            case "profilefragment":
+            case "ProfileFragment":
                 toolbar.setTitle("Profile");
+                break;
+            case "CurrentWorkoutFragment":
+                Workout workout = Workout.workouts.get(SessionController.currentUser.getActiveWorkout().toString());
+                toolbar.setTitle(workout.getName());
+                break;
+            default:
+                toolbar.setTitle("Fragment Title");
                 break;
         }
     }
@@ -143,6 +158,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        setToolbarTitle(); // Set toolbar title to current fragment, won't work when switching fragments as this is executed on another thread
+        //setToolbarTitle(); // Set toolbar title to current fragment, won't work when switching fragments as this is executed on another thread
     }
 }

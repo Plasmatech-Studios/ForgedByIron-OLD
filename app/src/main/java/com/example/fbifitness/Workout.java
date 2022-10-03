@@ -88,6 +88,8 @@ public class Workout extends UniqueID implements Config, Saveable {
             this.totalTime = new Date(this.getTimeCompleted().getTime() - this.getTimeStarted().getTime());
         }
         User.users.get(this.userID.toString()).setActiveWorkout(null); // Set the user's active workout to null
+
+        save();
     }
 
     public UniqueID addExercise(ExerciseType type) {
@@ -96,8 +98,8 @@ public class Workout extends UniqueID implements Config, Saveable {
     }
 
     public UniqueID addExercise(ExerciseType type, String name) {
-        Exercise exercice = Exercise.newExercise(this.getUniqueID(), type, name);
-        return exercice.getUniqueID();
+        Exercise exercise = Exercise.newExercise(this.getUniqueID(), type, name);
+        return exercise.getUniqueID();
     }
 
     public void setName(String name) {

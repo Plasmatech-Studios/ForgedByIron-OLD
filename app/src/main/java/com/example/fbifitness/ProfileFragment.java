@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -61,6 +62,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         super.onCreate(savedInstanceState);
 
 
+
 //        if (getArguments() != null) {
 //            mParam1 = getArguments().getString(ARG_PARAM1);
 //            mParam2 = getArguments().getString(ARG_PARAM2);
@@ -75,6 +77,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_profile, container, false);
+        TextView username = view.findViewById(R.id.usernameTextProfile);
+        username.setText(MainActivity.sessionController.getActiveUserName());
+
+        TextView workoutCount = view.findViewById(R.id.workoutTotalTextViewProfile);
+        workoutCount.setText(String.valueOf(MainActivity.sessionController.getActiveUserWorkoutCount()));
+
 //        insertButton = (Button) view.findViewById(R.id.btnInsert);
 //        fetchButton = (Button) view.findViewById(R.id.btnFetch);
 //        etUserID = (EditText) view.findViewById(R.id.eTUniqueID);

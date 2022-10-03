@@ -82,6 +82,9 @@ public class Exercise extends UniqueID implements Config, Saveable {
             this.timeCompleted = new Date(System.currentTimeMillis());
             this.totalTime = new Date(this.timeCompleted.getTime() - this.timeStarted.getTime());
         }
+        for (Set set : this.sets) {
+            set.complete();
+        }
         save();
     }
 
