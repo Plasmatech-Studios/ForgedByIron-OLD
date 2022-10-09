@@ -22,6 +22,13 @@ public class Set implements Config, Saveable {
         }
     }
 
+    public Set(String weightTime, String reps, ActivityState state) {
+        this.setType = ExerciseType.WEIGHT;
+        this.state = state;
+        this.reps = reps;
+        this.weight = weightTime;
+    }
+
     public void complete() {
         this.state = ActivityState.COMPLETED;
     }

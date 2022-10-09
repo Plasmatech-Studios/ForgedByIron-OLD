@@ -43,7 +43,7 @@ public class SecurityManager implements Config {
 
          if (secretKey.equals(DataManager.getAuthSecretKey(username, tempID))) {
              System.out.println("Logged in as " + username);
-             User user = User.newUserFromLoad(username, tempID, secretKey);
+             User user = User.newUserFromLoad(tempID, username, secretKey);
              return user;
          } else {
              Log.d("SecurityManager", "Error: Incorrect password");

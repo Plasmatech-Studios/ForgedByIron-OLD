@@ -49,6 +49,17 @@ public class DatabaseHelper extends SQLiteOpenHelper implements Config {
     static final String EXERCISE_TOTAL_TIME = "totalTime";
     static final String EXERCISE_SET_DATA = "setData";
 
+    static final String SUMMARY_TABLE = "SUMMARY";
+    static final String SUMMARY_USER_ID = "userID";
+    static final String SUMMARY_DISPLAY_NAME = "displayName";
+    static final String SUMMARY_BIO = "bio";
+    static final String SUMMARY_WEIGHT = "weight";
+    static final String SUMMARY_FAT = "fat";
+    static final String SUMMARY_LONGEST_RUN = "longestRun";
+    static final String SUMMARY_BENCH_PR = "benchPR";
+    static final String SUMMARY_DEADLIFT_PR = "deadliftPR";
+    static final String SUMMARY_SQUAT_PR = "squatPR";
+
     static final String SET_TABLE = "'SET'"; // NOT IN USE
 //    static final String SET_SET_ID = "setID";
 //    static final String SET_EXERCISE_ID = "exerciseID";
@@ -83,6 +94,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements Config {
             "DROP TABLE IF EXISTS " + SET_TABLE + ";";
     static final String DROP_EXERCISE_TYPE_TABLE =
             "DROP TABLE IF EXISTS " + EXERCISE_TYPE_TABLE + ";";
+    static final String DROP_SUMMARY_TABLE =
+            "DROP TABLE IF EXISTS " + SUMMARY_TABLE + ";";
 
     static final String CREATE_LOCAL_LOGIN_TABLE_QUERY =
         "CREATE TABLE IF NOT EXISTS " + LOGIN_TABLE +" (" +
@@ -141,6 +154,20 @@ public class DatabaseHelper extends SQLiteOpenHelper implements Config {
 //              "FOREIGN KEY (" + EXERCISE_USER_ID + ") REFERENCES " + USER_TABLE + " (" + USER_USER_ID + "), " +
 //              "FOREIGN KEY (" + EXERCISE_CREATED_BY_ID + ") REFERENCES " + USER_TABLE + " (" + USER_USER_ID + "));";
 
+    static final String CREATE_LOCAL_SUMMARY_TABLE_QUERY =
+        "CREATE TABLE IF NOT EXISTS " + SUMMARY_TABLE + " (" +
+                SUMMARY_USER_ID + " TEXT PRIMARY KEY NOT NULL, " +
+                SUMMARY_DISPLAY_NAME + " TEXT NOT NULL, " +
+                SUMMARY_BIO + " TEXT NOT NULL," +
+                SUMMARY_WEIGHT + " TEXT NOT NULL, " +
+                SUMMARY_FAT + " TEXT NOT NULL, " +
+                SUMMARY_LONGEST_RUN + " TEXT NOT NULL, " +
+                SUMMARY_BENCH_PR + " TEXT NOT NULL, " +
+                SUMMARY_DEADLIFT_PR + " TEXT NOT NULL, " +
+                SUMMARY_SQUAT_PR + " TEXT NOT NULL, " +
+                "FOREIGN KEY (" + SUMMARY_USER_ID + ") REFERENCES " + USER_TABLE + " (" + USER_USER_ID + "));";
+
+
 //    static final String CREATE_LOCAL_SET_TABLE_QUERY =
 //        "CREATE TABLE " + SET_TABLE + " (" + SET_SET_ID + " TEXT PRIMARY KEY NOT NULL, " + SET_EXERCISE_ID + " TEXT NOT NULL, " +
 //        "" + SET_WEIGHT + " REAL, " + SET_REPS + " INT, " + SET_SET_NUMBER + " INT, " + SET_TIME_SECONDS + " REAL, " +
@@ -158,24 +185,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements Config {
 
         super(context, LOCAL_DB_NAME , null, LOCAL_DB_VERSION);
 
-//        // drop the database if it exists
-//        context.deleteDatabase("FBI.db");
-//        context.deleteDatabase("FBI.db-journal");
-//
-//        context.deleteDatabase("Forged.db");
-//        context.deleteDatabase("Forged.db-journal");
-//
-//        context.deleteDatabase("Test3.db");
-//        context.deleteDatabase("Test3.db-journal");
-//
-//        context.deleteDatabase("Test4.db");
-//        context.deleteDatabase("Test4.db-journal");
-//
-//        context.deleteDatabase("Test5.db");
-//        context.deleteDatabase("Test5.db-journal");
-//
-//        context.deleteDatabase("Test6.db");
-//        context.deleteDatabase("Test6.db-journal");
     }
 
 

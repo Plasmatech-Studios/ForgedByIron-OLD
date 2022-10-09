@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import java.sql.SQLDataException;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class DataManager implements Config {
@@ -21,7 +22,7 @@ public class DataManager implements Config {
     public DataManager open() throws SQLDataException {
         dbHelper = new DatabaseHelper(context);
         database = dbHelper.getWritableDatabase();
-        dropAllTables();
+        //dropAllTables();
         createTables();
         //database.execSQL("DROP TABLE IF EXISTS USER;"); // TODO Remove before production);
         //database.execSQL(DatabaseHelper.CREATE_LOCAL_USER_TABLE_QUERY);
@@ -44,6 +45,8 @@ public class DataManager implements Config {
         database.execSQL(DatabaseHelper.DROP_EXERCISE_TABLE);
         database.execSQL(DatabaseHelper.DROP_SET_TABLE);
         database.execSQL(DatabaseHelper.DROP_EXERCISE_TYPE_TABLE);
+        database.execSQL(DatabaseHelper.DROP_SUMMARY_TABLE);
+
         Log.d("WARNING", "ALL TABLES DROPPED");
     }
 
@@ -53,52 +56,16 @@ public class DataManager implements Config {
         database.execSQL(DatabaseHelper.CREATE_LOCAL_USER_TABLE_QUERY);
         database.execSQL(DatabaseHelper.CREATE_LOCAL_WORKOUT_TABLE_QUERY);
         database.execSQL(DatabaseHelper.CREATE_LOCAL_EXERCISE_TABLE_QUERY);
+        database.execSQL(DatabaseHelper.CREATE_LOCAL_SUMMARY_TABLE_QUERY);
         //database.execSQL(DatabaseHelper.CREATE_LOCAL_SET_TABLE_QUERY);
         //database.execSQL(DatabaseHelper.CREATE_LOCAL_EXERCISE_TYPE_TABLE_QUERY);
         Log.d("WARNING", "ALL TABLES CREATED");
     }
 
-//    public static void insertLogin(String inUsername, String inUserID) {
-//        // Ensure a user with the same ID does not already exist using select count
-//        String countQuery = "SELECT * FROM " + DatabaseHelper.LOGIN_TABLE + " WHERE " + DatabaseHelper.LOGIN_USER_ID + " = '" + inUserID + "';";
-//        Cursor cursor = database.rawQuery(countQuery, null);
-//        if (cursor.getCount() > 0) {
-//            Log.d("WARNING", "User with that ID already exists");
-//            return;
-//        }
-//
-//        ContentValues contentValues = new ContentValues();
-//        contentValues.put(DatabaseHelper.LOGIN_USERNAME, inUsername);
-//        contentValues.put(DatabaseHelper.LOGIN_USER_ID, inUserID);
-//
-//        database.insert(DatabaseHelper.LOGIN_TABLE, null, contentValues);
-//    }
-
-//   public static void insertAuth(String inUserID, String inSecretKey) {
-//        // Ensure a user with the same ID does not already exist using select count
-//        String countQuery = "SELECT * FROM " + DatabaseHelper.AUTH_TABLE + " WHERE " + DatabaseHelper.AUTH_USER_ID + " = '" + inUserID + "';";
-//        Cursor cursor = database.rawQuery(countQuery, null);
-//        if (cursor.getCount() > 0) {
-//            Log.d("WARNING", "User with that ID already exists");
-//            return;
-//        }
-//
-//        ContentValues contentValues = new ContentValues();
-//        contentValues.put(DatabaseHelper.AUTH_USER_ID, inUserID);
-//        contentValues.put(DatabaseHelper.AUTH_SECRET_KEY, inSecretKey);
-//
-//        database.insert(DatabaseHelper.AUTH_TABLE, null, contentValues);
-//    }
-
     public static void saveUser(String inUserID, String inUsername, String inSecretKey, String activeWorkoutID) {
         //Ensure a user with the same ID does not already exist using select count
         String countQuery = "SELECT * FROM " + DatabaseHelper.USER_TABLE + " WHERE " + DatabaseHelper.USER_USER_ID + " = '" + inUserID + "';";
         Cursor cursor = database.rawQuery(countQuery, null);
-//        if (cursor.getCount() > 0) {
-//            Log.d("WARNING", "User with that ID already exists");
-//            return;
-//        }
-
         ContentValues contentValues = new ContentValues();
         contentValues.put("userID", inUserID);
         contentValues.put("username", inUsername);
@@ -113,7 +80,6 @@ public class DataManager implements Config {
         } else {
             database.insert(DatabaseHelper.USER_TABLE, null, contentValues);
         }
-        //database.insert(DatabaseHelper.USER_TABLE, null, contentValues);
     }
 
     public static void saveNewUser(String inUserID, String inUsername, String inSecretKey) {
@@ -163,6 +129,152 @@ public class DataManager implements Config {
             return null;
         }
     }
+
+    public static String getActiveWorkoutID(String inUserID) {
+        String countQuery = "SELECT activeWorkout FROM " + DatabaseHelper.USER_TABLE + " WHERE " + DatabaseHelper.USER_USER_ID + " = '" + inUserID + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() == 0) {
+            return null;
+        }
+        try {
+            cursor.moveToFirst();
+            return cursor.getString(0);
+        } catch (Exception e) {
+            Log.d("WARNING", "Error finding user ID from username");
+            return null;
+        }
+    }
+
+    public static boolean workoutExists(String workoutID) {
+        String countQuery = "SELECT * FROM " + DatabaseHelper.WORKOUT_TABLE + " WHERE " + DatabaseHelper.WORKOUT_WORKOUT_ID + " = '" + workoutID + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() == 0) {
+            return false;
+        }
+        return true;
+    }
+
+    public static String getUserIDFromWorkout(String workoutID) {
+        String countQuery = "SELECT userID FROM " + DatabaseHelper.WORKOUT_TABLE + " WHERE " + DatabaseHelper.WORKOUT_WORKOUT_ID + " = '" + workoutID + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() == 0) {
+            return null;
+        }
+        try {
+            cursor.moveToFirst();
+            return cursor.getString(0);
+        } catch (Exception e) {
+            Log.d("WARNING", "Error finding user ID from workoutID");
+            return null;
+        }
+    }
+
+    public static String getWorkoutName(String workoutID) {
+        String countQuery = "SELECT workoutName FROM " + DatabaseHelper.WORKOUT_TABLE + " WHERE " + DatabaseHelper.WORKOUT_WORKOUT_ID + " = '" + workoutID + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() == 0) {
+            return null;
+        }
+        try {
+            cursor.moveToFirst();
+            return cursor.getString(0);
+        } catch (Exception e) {
+            Log.d("WARNING", "Error finding workoutName from workoutID");
+            return null;
+        }
+    }
+
+    public static String getWorkoutState(String workoutID) {
+        String countQuery = "SELECT state FROM " + DatabaseHelper.WORKOUT_TABLE + " WHERE " + DatabaseHelper.WORKOUT_WORKOUT_ID + " = '" + workoutID + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() == 0) {
+            return null;
+        }
+        try {
+            cursor.moveToFirst();
+            return cursor.getString(0);
+        } catch (Exception e) {
+            Log.d("WARNING", "Error finding state from workoutID");
+            return null;
+        }
+    }
+
+    public static String getWorkoutTimeStarted(String workoutID) {
+        String countQuery = "SELECT timeStarted FROM " + DatabaseHelper.WORKOUT_TABLE + " WHERE " + DatabaseHelper.WORKOUT_WORKOUT_ID + " = '" + workoutID + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() == 0) {
+            return null;
+        }
+        try {
+            cursor.moveToFirst();
+            return cursor.getString(0);
+        } catch (Exception e) {
+            Log.d("WARNING", "Error finding timeStarted from workoutID");
+            return null;
+        }
+    }
+
+    public static String getWorkoutTimeCompleted(String workoutID) {
+        String countQuery = "SELECT timeCompleted FROM " + DatabaseHelper.WORKOUT_TABLE + " WHERE " + DatabaseHelper.WORKOUT_WORKOUT_ID + " = '" + workoutID + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() == 0) {
+            return null;
+        }
+        try {
+            cursor.moveToFirst();
+            return cursor.getString(0);
+        } catch (Exception e) {
+            Log.d("WARNING", "Error finding timeCompleted from workoutID");
+            return null;
+        }
+    }
+
+    public static String getWorkoutTotalTime(String workoutID) {
+        String countQuery = "SELECT totalTime FROM " + DatabaseHelper.WORKOUT_TABLE + " WHERE " + DatabaseHelper.WORKOUT_WORKOUT_ID + " = '" + workoutID + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() == 0) {
+            return null;
+        }
+        try {
+            cursor.moveToFirst();
+            return cursor.getString(0);
+        } catch (Exception e) {
+            Log.d("WARNING", "Error finding totalTime from workoutID");
+            return null;
+        }
+    }
+
+    public static void fillExerciseList(String workoutID) {
+        SessionController controller = SessionController.getInstance();
+        String countQuery = "SELECT * FROM " + DatabaseHelper.EXERCISE_TABLE + " WHERE " + DatabaseHelper.EXERCISE_WORKOUT_ID + " = '" + workoutID + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() == 0) {
+            return;
+        }
+        //try {
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                String exerciseID = cursor.getString(0);
+                // Workout ID
+                String exerciseTypeID = cursor.getString(2);
+                String exerciseName = cursor.getString(3);
+                String exerciseState = cursor.getString(4);
+                String exerciseTimeStarted = cursor.getString(5);
+                String exerciseTimeCompleted = cursor.getString(6);
+                String exerciseTotalTime = cursor.getString(7);
+                String setData = cursor.getString(8);
+                Exercise exercise = Exercise.newExerciseFromLoad(workoutID, exerciseID, exerciseTypeID, exerciseName, exerciseState, exerciseTimeStarted, exerciseTimeCompleted, exerciseTotalTime, setData);
+                ExerciseListView view = new ExerciseListView(exercise);
+                controller.exerciseList.add(view);
+                cursor.moveToNext();
+            }
+//        } catch (Exception e) {
+//            Log.e("WARNING", "Error filling exercise list " + e.getMessage());
+//        }
+    }
+
+
+
 
 //   public static void insertWorkout(String inWorkoutID, String inUserID, String inCreatedByID,
 //                             String inWorkoutName, String inState, String inModified,
@@ -444,6 +556,93 @@ public class DataManager implements Config {
             // update
             database.update(DatabaseHelper.EXERCISE_TABLE, contentValues, DatabaseHelper.EXERCISE_EXERCISE_ID + " = '" + exerciseID + "';", null);
         }
+
+    }
+
+
+    public static Summary getSummary(String userID) {
+        Summary summary = new Summary();
+        String countQuery = "SELECT * FROM " + DatabaseHelper.SUMMARY_TABLE + " WHERE " + DatabaseHelper.SUMMARY_USER_ID + " = '" + userID + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() == 0) {
+            Log.d("WARNING", "Summary does not exist");
+            return null;
+        }
+        cursor.moveToFirst();
+        summary.setUserID(cursor.getString(0));
+        summary.setDisplayName(cursor.getString(1));
+        summary.setBio(cursor.getString(2));
+        summary.setWeight(cursor.getString(3));
+        summary.setFat(cursor.getString(4));
+        summary.setLongestRun(cursor.getString(5));
+        summary.setBenchPR(cursor.getString(6));
+        summary.setDeadliftPR(cursor.getString(7));
+        summary.setSquatPR(cursor.getString(8));
+
+        return summary;
+
+    }
+
+    public static void saveSummary(Summary summary) {
+        // if any values are null, set them to 0
+        if (summary.getWeight() == null) {
+            summary.setWeight("0");
+        }
+        if (summary.getFat() == null) {
+            summary.setFat("0");
+        }
+        if (summary.getLongestRun() == null) {
+            summary.setLongestRun("0");
+        }
+        if (summary.getBenchPR() == null) {
+            summary.setBenchPR("0");
+        }
+        if (summary.getDeadliftPR() == null) {
+            summary.setDeadliftPR("0");
+        }
+        if (summary.getSquatPR() == null) {
+            summary.setSquatPR("0");
+        }
+        if (summary.getDisplayName() == null) {
+            summary.setDisplayName("null");
+        }
+        if (summary.getBio() == null) {
+            summary.setBio("null");
+        }
+
+        String userID = summary.getUserID();
+        String displayName = summary.getDisplayName();
+        String bio = summary.getBio();
+        String weight = summary.getWeight();
+        String fat = summary.getFat();
+        String longestRun = summary.getLongestRun();
+        String benchPR = summary.getBenchPR();
+        String deadliftPR = summary.getDeadliftPR();
+        String squatPR = summary.getSquatPR();
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(DatabaseHelper.SUMMARY_USER_ID, userID);
+        contentValues.put(DatabaseHelper.SUMMARY_DISPLAY_NAME, displayName);
+        contentValues.put(DatabaseHelper.SUMMARY_BIO, bio);
+        contentValues.put(DatabaseHelper.SUMMARY_WEIGHT, weight);
+        contentValues.put(DatabaseHelper.SUMMARY_FAT, fat);
+        contentValues.put(DatabaseHelper.SUMMARY_LONGEST_RUN, longestRun);
+        contentValues.put(DatabaseHelper.SUMMARY_BENCH_PR, benchPR);
+        contentValues.put(DatabaseHelper.SUMMARY_DEADLIFT_PR, deadliftPR);
+        contentValues.put(DatabaseHelper.SUMMARY_SQUAT_PR, squatPR);
+
+        // Ensure summary exists
+        String countQuery = "SELECT * FROM " + DatabaseHelper.SUMMARY_TABLE + " WHERE " + DatabaseHelper.SUMMARY_USER_ID + " = '" + userID + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() == 0) {
+            // insert
+            database.insert(DatabaseHelper.SUMMARY_TABLE, null, contentValues);
+            Log.d("INFO", "Summary inserted");
+        } else {
+            // update
+            database.update(DatabaseHelper.SUMMARY_TABLE, contentValues, DatabaseHelper.SUMMARY_USER_ID + " = '" + userID + "';", null);
+        }
+
 
     }
 

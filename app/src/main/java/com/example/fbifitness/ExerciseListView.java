@@ -16,6 +16,9 @@ public class ExerciseListView implements Config {
         this.exerciseType = exercise.getExerciseType();
         this.exerciseComplete = false;
         this.setList = new ArrayList<SetListView>();
+        for (Set set : exercise.getSets()) {
+            this.setList.add(new SetListView(set.reps, set.weight));
+        }
 
     }
 

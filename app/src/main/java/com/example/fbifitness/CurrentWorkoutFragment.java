@@ -8,15 +8,18 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.SystemClock;
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 
 // Controller for the recycler view in the CurrentWorkoutFragment
@@ -45,6 +48,7 @@ public class CurrentWorkoutFragment extends Fragment implements Exercise_Interfa
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
     }
 
     @Override
@@ -57,11 +61,11 @@ public class CurrentWorkoutFragment extends Fragment implements Exercise_Interfa
         TextView textView = view.findViewById(R.id.workoutTitleText);
         Workout currentWorkout = Workout.workouts.get(SessionController.currentUser.getActiveWorkout().toString());
         textView.setText(currentWorkout.getName());
+
         RecyclerView recyclerView = view.findViewById(R.id.currentWorkoutExerciseList);
         workout_adaptor = new Workout_Adaptor(getContext(), SessionController.exerciseList, this);
         recyclerView.setAdapter(workout_adaptor);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
         addExerciseButton = view.findViewById(R.id.NewExerciseText);
         addExerciseButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,7 +75,6 @@ public class CurrentWorkoutFragment extends Fragment implements Exercise_Interfa
                 addNewExercise(view);
             }
         });
-
         endWorkoutButton = view.findViewById(R.id.EndWorkoutText);
         endWorkoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,7 +84,9 @@ public class CurrentWorkoutFragment extends Fragment implements Exercise_Interfa
                 //(view);
             }
         });
-
+        Chronometer mChronometer= view.findViewById(R.id.chronometer);
+        mChronometer.setBase(SystemClock.elapsedRealtime());
+        mChronometer.start();
         return view;
     }
 

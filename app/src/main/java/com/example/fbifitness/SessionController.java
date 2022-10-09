@@ -34,7 +34,8 @@ public class SessionController implements Config {
         if (currentUser == null) {
             Log.d("SessionController", "Error: Login failed");
             try { // TODO DO NOT DEFAULT TO THIS - MOVE TO LOGIN ACTIVITY
-            securityManager.newUser("admin", "password");
+                Log.e("SessionController", "Error: Login failed - Creating new user");
+                securityManager.newUser("admin", "password");
             } catch (NoSuchAlgorithmException e) {
                 Log.d("SessionController", "Error: NoSuchAlgorithmException");
             }
@@ -42,9 +43,8 @@ public class SessionController implements Config {
             Log.d("SessionController", "Logged in as " + currentUser.getUsername());
         }
 
-        requestNewWorkout("Chest");
+        //requestNewWorkout("Chest");
         MainActivity.bottomNavigationView.setSelectedItemId(R.id.profile);
-
     }
 
     private void login() {
@@ -58,6 +58,10 @@ public class SessionController implements Config {
             } else {
                 Log.i("SessionController", "Logged in as " + user.getUsername());
                 currentUser = user;
+                exerciseList = new ArrayList<ExerciseListView>();
+                if (currentUser.getActiveWorkout() != null) {
+                    DataManager.fillExerciseList(currentUser.getActiveWorkout().toString());
+                }
             }
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();

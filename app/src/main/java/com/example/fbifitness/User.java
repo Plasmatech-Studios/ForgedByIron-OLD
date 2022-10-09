@@ -10,6 +10,7 @@ public class User extends UniqueID implements Config, Saveable {
     private String username;
     private String secretKey;
     private UniqueID activeWorkout;
+    private Summary summary;
 
     public static HashMap<String, User> users = new HashMap<String, User>(); // UniqueID, User
 
@@ -24,20 +25,30 @@ public class User extends UniqueID implements Config, Saveable {
         if (users.containsKey(uniqueID)) {
             return users.get(uniqueID);
         }
-        User user = new User(uniqueID, username, secretKey);
+        String activeWorkout = DataManager.getActiveWorkoutID(uniqueID);
+        User user = new User(uniqueID, username, secretKey, activeWorkout);
         users.put(user.getUniqueID().toString(), user);
+        if (user.getActiveWorkout() != null) {
+            Workout workout = Workout.newWorkoutFromLoad(activeWorkout);
+
+        }
         return user;
     }
     private User(String username, String secretKey) { // Create a new user on the device
         super(IDType.USER);
         this.username = username;
         this.secretKey = secretKey;
+        this.summary = new Summary(this.getUniqueID().toString());
     }
 
-    private User(String uniqueID, String username, String secretKey) { // Create a new user from the Database
+    private User(String uniqueID, String username, String secretKey, String activeWorkout) { // Create a new user from the Database
         super(uniqueID, IDType.USER);
         this.username = username;
         this.secretKey = secretKey;
+        if (activeWorkout != null) {
+            this.activeWorkout = new UniqueID(activeWorkout, IDType.WORKOUT);
+        }
+        this.summary = DataManager.getSummary(uniqueID);
     }
 
     public String getUsername() {
@@ -104,6 +115,98 @@ public class User extends UniqueID implements Config, Saveable {
         count = DataManager.getWorkoutCount(this.getUniqueID().toString());
         return count;
     }
+
+    public int getFollowersCount() { // TODO Later when online services are implemented
+        int count = 0;
+        //count = DataManager.getFollowersCount(this.getUniqueID().toString());
+        return count;
+    }
+
+    public int getBadgeCount() { // TODO Later when online badges are implemented
+        int count = 0;
+        //count = DataManager.getBadgeCount(this.getUniqueID().toString());
+        return count;
+    }
+    public String getDisplayName() {
+        String displayName = summary.getDisplayName();
+        if (displayName == null) {
+            return this.getUsername();
+        } else {
+            return displayName;
+        }
+    }
+
+    public String getBio() { // TODO Later when login is implemented
+        String bio = summary.getBio();
+        return bio;
+    }
+
+    public String getUserWeight() { // TODO Later when login is implemented
+        String weight = summary.getWeight();
+        return weight;
+    }
+
+    public String getUserFat() { // TODO Later when login is implemented
+        String fat = summary.getFat();
+        return fat;
+    }
+
+    public String getLongestRun() { // TODO Later when login is implemented
+        String longestRun = summary.getLongestRun();
+        return longestRun;
+    }
+
+    public String getBenchPB() { // TODO Later when login is implemented
+        String benchPB = summary.getBenchPR();
+        return benchPB;
+    }
+
+    public String getDeadliftPB() { // TODO Later when login is implemented
+        String deadliftPB = summary.getDeadliftPR();
+        return deadliftPB;
+    }
+
+    public String getSquatPB() { // TODO Later when login is implemented
+        String squatPB = summary.getSquatPR();
+        return squatPB;
+    }
+
+    //setters
+
+    public void setDisplayName(String displayName) {
+        summary.setDisplayName(displayName);
+    }
+
+    public void setBio(String bio) {
+        summary.setBio(bio);
+    }
+
+    public void setUserWeight(String weight) {
+        summary.setWeight(weight);
+    }
+
+    public void setUserFat(String fat) {
+        summary.setFat(fat);
+    }
+
+    public void setLongestRun(String longestRun) {
+        summary.setLongestRun(longestRun);
+    }
+
+    public void setBenchPB(String benchPB) {
+        summary.setBenchPR(benchPB);
+    }
+
+    public void setDeadliftPB(String deadliftPB) {
+        summary.setDeadliftPR(deadliftPB);
+    }
+
+    public void setSquatPB(String squatPB) {
+        summary.setSquatPR(squatPB);
+    }
+
+
+
 
 
     @Override
