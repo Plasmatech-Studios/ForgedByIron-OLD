@@ -72,6 +72,10 @@ public class MainActivity extends AppCompatActivity {
 
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             Log.d("Bottom Nav", "Selected");
+            if (SessionController.currentUser == null) {
+                Log.d("Bottom Nav", "No user");
+                return false;
+            }
             switch(item.getItemId()) {
                 case R.id.community:
                     replaceFragment(communityFragment);

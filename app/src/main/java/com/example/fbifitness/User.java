@@ -136,37 +136,37 @@ public class User extends UniqueID implements Config, Saveable {
         }
     }
 
-    public String getBio() { // TODO Later when login is implemented
+    public String getBio() {
         String bio = summary.getBio();
         return bio;
     }
 
-    public String getUserWeight() { // TODO Later when login is implemented
+    public String getUserWeight() {
         String weight = summary.getWeight();
         return weight;
     }
 
-    public String getUserFat() { // TODO Later when login is implemented
+    public String getUserFat() {
         String fat = summary.getFat();
         return fat;
     }
 
-    public String getLongestRun() { // TODO Later when login is implemented
+    public String getLongestRun() {
         String longestRun = summary.getLongestRun();
         return longestRun;
     }
 
-    public String getBenchPB() { // TODO Later when login is implemented
+    public String getBenchPB() {
         String benchPB = summary.getBenchPR();
         return benchPB;
     }
 
-    public String getDeadliftPB() { // TODO Later when login is implemented
+    public String getDeadliftPB() {
         String deadliftPB = summary.getDeadliftPR();
         return deadliftPB;
     }
 
-    public String getSquatPB() { // TODO Later when login is implemented
+    public String getSquatPB() {
         String squatPB = summary.getSquatPR();
         return squatPB;
     }

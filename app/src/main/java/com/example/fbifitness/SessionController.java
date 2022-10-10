@@ -30,7 +30,7 @@ public class SessionController implements Config {
 
     public void startSession() {
         securityManager = SecurityManager.getInstance();
-        login();
+        login("admin", "password");
         if (currentUser == null) {
             Log.d("SessionController", "Error: Login failed");
             try { // TODO DO NOT DEFAULT TO THIS - MOVE TO LOGIN ACTIVITY
@@ -43,15 +43,15 @@ public class SessionController implements Config {
             Log.d("SessionController", "Logged in as " + currentUser.getUsername());
         }
 
-        //requestNewWorkout("Chest");
-        MainActivity.bottomNavigationView.setSelectedItemId(R.id.profile);
+
+        //change fragment to login
+        MainActivity.mainActivity.replaceFragment(new LoginFragment());
     }
 
-    private void login() {
-        String username = "admin";
+    private void login(String username, String password) {
         User user;
         try {
-            user = securityManager.login(username, "password");
+            user = securityManager.login(username, password);
             if (user == null) {
                 Log.e("SessionController", "Error: Login failed");
                 return;
