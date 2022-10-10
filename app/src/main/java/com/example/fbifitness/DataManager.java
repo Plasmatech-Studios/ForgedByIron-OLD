@@ -24,6 +24,7 @@ public class DataManager implements Config {
         database = dbHelper.getWritableDatabase();
         //dropAllTables();
         createTables();
+
         //database.execSQL("DROP TABLE IF EXISTS USER;"); // TODO Remove before production);
         //database.execSQL(DatabaseHelper.CREATE_LOCAL_USER_TABLE_QUERY);
 
@@ -642,10 +643,85 @@ public class DataManager implements Config {
             // update
             database.update(DatabaseHelper.SUMMARY_TABLE, contentValues, DatabaseHelper.SUMMARY_USER_ID + " = '" + userID + "';", null);
         }
+    }
 
+    public static ArrayList<String> getAllWorkoutIDByUser(String userID) {
+        ArrayList<String> workoutIDs = new ArrayList<>();
+        String countQuery = "SELECT * FROM " + DatabaseHelper.WORKOUT_TABLE + " WHERE " + DatabaseHelper.WORKOUT_USER_ID + " = '" + userID + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() == 0) {
+            Log.d("WARNING", "No workouts found");
+            return workoutIDs;
+        }
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            workoutIDs.add(cursor.getString(0));
+            cursor.moveToNext();
+        }
+        return workoutIDs;
+    }
+
+    public static String getExerciseNameByID (String exerciseID) {
+        String countQuery = "SELECT * FROM " + DatabaseHelper.EXERCISE_TABLE + " WHERE " + DatabaseHelper.EXERCISE_EXERCISE_ID + " = '" + exerciseID + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() == 0) {
+            Log.d("WARNING", "No exercise name found");
+            return null;
+        }
+        cursor.moveToFirst();
+        return cursor.getString(3);
 
     }
 
+    public static Double getExerciseWeightTotalByID(String exerciseID) {
+        String countQuery = "SELECT * FROM " + DatabaseHelper.EXERCISE_TABLE + " WHERE " + DatabaseHelper.EXERCISE_EXERCISE_ID + " = '" + exerciseID + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() == 0) {
+            Log.d("WARNING", "No exercise weight total found");
+            return null;
+        }
+        cursor.moveToFirst();
+        double weightTotal = 0;
+        String setData = cursor.getString(8);
+        String[] sets = setData.split(";");
+        for (String set : sets) {
+            String[] setInfo = set.split(",");
+            double reps = Double.parseDouble(setInfo[0]);
+            double weight = Double.parseDouble(setInfo[1]);
+            weightTotal += reps * weight;
+
+        }
+        return weightTotal;
+
+    }
+
+    public static ArrayList<String> getExerciseIDByWorkoutID(String workoutID) {
+        ArrayList<String> exerciseIDs = new ArrayList<>();
+        String countQuery = "SELECT * FROM " + DatabaseHelper.EXERCISE_TABLE + " WHERE " + DatabaseHelper.EXERCISE_WORKOUT_ID + " = '" + workoutID + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() == 0) {
+            Log.d("WARNING", "No exercises found");
+            return exerciseIDs;
+        }
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            exerciseIDs.add(cursor.getString(0));
+            cursor.moveToNext();
+        }
+        return exerciseIDs;
+        
+    }
+
+    public static String getWorkoutDate(String workoutID) {
+        String countQuery = "SELECT * FROM " + DatabaseHelper.WORKOUT_TABLE + " WHERE " + DatabaseHelper.WORKOUT_WORKOUT_ID + " = '" + workoutID + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() == 0) {
+            Log.d("WARNING", "No workout date found");
+            return null;
+        }
+        cursor.moveToFirst();
+        return cursor.getString(4);
+    }
 
 
 

@@ -1,14 +1,16 @@
 package com.example.fbifitness;
 
+import android.content.Context;
 import android.graphics.Color;
-import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.PieChart;
@@ -21,45 +23,41 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.util.ArrayList;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link CommunityFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class CommunityFragment extends Fragment {
-    PieChart pieChart;
+public class ReportAdaptor extends RecyclerView.Adapter<ReportAdaptor.MyViewHolder> {
 
+    Context context;
+    ArrayList<Report> reports;
 
-    public CommunityFragment() {
-        // Required empty public constructor
+    public ReportAdaptor(Context context, ArrayList<Report> reports) {
+        this.context = context;
+        this.reports = reports;
     }
 
-    public static CommunityFragment newInstance(String param1, String param2) {
-        CommunityFragment fragment = new CommunityFragment();
 
-        return fragment;
+    @NonNull
+    @Override
+    public ReportAdaptor.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context).inflate(R.layout.report_entry, parent, false);
+        return new ReportAdaptor.MyViewHolder(view);
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onBindViewHolder(@NonNull ReportAdaptor.MyViewHolder holder, int position) {
+        Report report = reports.get(position);
+        holder.reportTitle.setText(report.getReportTitle());
+        holder.pieChart = loadPieChartData(holder.pieChart, report);
 
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_community, container, false);
-        pieChart = view.findViewById(R.id.pieChartTest);
-        loadPieChartData(pieChart);
-        // Inflate the layout for this fragment
-        return view;
+    public int getItemCount() {
+        return reports.size();
     }
 
     private PieChart setupPieChart(PieChart chart, String centreText) {
         chart.setDrawHoleEnabled(true);
 
-        chart.setUsePercentValues(true);
+        //chart.setUsePercentValues(true);
         chart.setHoleColor(Color.BLACK);
         chart.setTransparentCircleAlpha(0);
 
@@ -76,23 +74,25 @@ public class CommunityFragment extends Fragment {
         legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
         legend.setOrientation(Legend.LegendOrientation.HORIZONTAL);
         legend.setWordWrapEnabled(true);
-        legend.setTextColor(Color.WHITE);
+        legend.setTextColor(Color.BLACK);
         legend.setTextSize(14f);
         legend.setDrawInside(false);
         legend.setEnabled(true);
         return chart;
     }
 
-    private PieChart loadPieChartData(PieChart pieChart) {
-        setupPieChart(pieChart, "Title of Pie Chart");
+    private PieChart loadPieChartData(PieChart pieChart, Report report) {
+        setupPieChart(pieChart, report.getTotalWeight() + "kg");
         ArrayList<PieEntry> entries = new ArrayList<>();
-
-
-        entries.add(new PieEntry(18.5f, "Bench Press"));
-        entries.add(new PieEntry(24.9f, "Squat"));
-        entries.add(new PieEntry(30f, "Deadlift"));
-        entries.add(new PieEntry(34.5f, "Overhead Press"));
-        entries.add(new PieEntry(40f, "Barbell Row"));
+        for (int i = 0; i < report.getExerciseCount(); i++) {
+            try {
+                float weight = Float.valueOf(String.valueOf((report.getExerciseWeightTotal(i))));
+                String exerciseName = report.getExerciseName(i);
+                entries.add(new PieEntry(weight, exerciseName));
+            } catch (Exception e) {
+                Log.e("ReportAdaptor", "ERROR while adding entry in Report Adaptor -> loadPieChartData: " + e.getMessage());
+            }
+        }
 
 
         ArrayList<Integer> colors = new ArrayList<>();
@@ -108,7 +108,11 @@ public class CommunityFragment extends Fragment {
 
         PieData data = new PieData(set);
         data.setDrawValues(true);
-        data.setValueFormatter(new PercentFormatter(pieChart));
+        //add KG to end of each value
+
+
+
+        //data.setValueFormatter(new PercentFormatter(pieChart));
         data.setValueTextSize(16f);
         data.setValueTextColor(Color.BLACK);
 
@@ -119,5 +123,18 @@ public class CommunityFragment extends Fragment {
 
         return pieChart;
 
+    }
+
+    public static class MyViewHolder extends RecyclerView.ViewHolder {
+
+        PieChart pieChart;
+        TextView reportTitle;
+
+        public MyViewHolder(@NonNull View itemView) {
+            super(itemView);
+            pieChart = itemView.findViewById(R.id.pieChart);
+            reportTitle = itemView.findViewById(R.id.reportTitleText);
+
+        }
     }
 }

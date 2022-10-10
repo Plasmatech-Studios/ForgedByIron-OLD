@@ -129,7 +129,7 @@ public class User extends UniqueID implements Config, Saveable {
     }
     public String getDisplayName() {
         String displayName = summary.getDisplayName();
-        if (displayName == null) {
+        if (displayName == null || displayName.equals("")) {
             return this.getUsername();
         } else {
             return displayName;
