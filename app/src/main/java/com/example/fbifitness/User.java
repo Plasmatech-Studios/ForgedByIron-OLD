@@ -97,12 +97,20 @@ public class User extends UniqueID implements Config, Saveable {
             return;
         }
         for (String workoutID : Workout.workouts.keySet()) {
-            if (workoutID.toString().equals(this.activeWorkout.toString())) {
-                Workout.workouts.get(workoutID).completeWorkout();
-                this.setActiveWorkout(null);
+            if (workoutID.equals(this.activeWorkout.toString())) {
                 Workout workout = Workout.workouts.get(workoutID);
+                workout.completeWorkout();
+                this.setActiveWorkout(null);
                 workout.save();
                 save();
+                //calculate the total weight lifted.
+                double totalWeightLifted = 0;
+                Report report = new Report(workout.getUniqueID().toString());
+                totalWeightLifted = report.getWorkoutWeightTotals();
+                Badge.checkTotalWeightLifted(totalWeightLifted);
+
+                Badge.checkWorkoutTotal(this.getWorkoutCount());
+
                 Log.d("User", "Ending workout: " + workoutID);
                 return;
             }
@@ -189,20 +197,156 @@ public class User extends UniqueID implements Config, Saveable {
         summary.setFat(fat);
     }
 
-    public void setLongestRun(String longestRun) {
-        summary.setLongestRun(longestRun);
-    }
-
     public void setBenchPB(String benchPB) {
         summary.setBenchPR(benchPB);
+        //remove the last 2 characters
+        benchPB = benchPB.substring(0, benchPB.length() - 2);
+        Long bench;
+        try {
+            bench = Long.parseLong(benchPB);
+            if (bench >= 20) {
+                Badge.unlockBadge("B20");
+            }
+            if (bench >= 40) {
+                Badge.unlockBadge("B40");
+            }
+            if (bench >= 60) {
+                Badge.unlockBadge("B60");
+            }
+            if (bench >= 80) {
+                Badge.unlockBadge("B80");
+            }
+            if (bench >= 100) {
+                Badge.unlockBadge("B100");
+            }
+            if (bench >= 125) {
+                Badge.unlockBadge("B125");
+            }
+            if (bench >= 150) {
+                Badge.unlockBadge("B150");
+            }
+            if (bench >= 200) {
+                Badge.unlockBadge("B200");
+            }
+            if (bench >= 250) {
+                Badge.unlockBadge("B250");
+            }
+        } catch (NumberFormatException e) {
+            Log.e("User", "Bench PR is not a number" + benchPB);
+            return;
+        }
     }
 
     public void setDeadliftPB(String deadliftPB) {
         summary.setDeadliftPR(deadliftPB);
+        //remove the last 2 characters
+        deadliftPB = deadliftPB.substring(0, deadliftPB.length() - 2);
+        Long deadlift;
+
+        try {
+            deadlift = Long.parseLong(deadliftPB);
+            if (deadlift >= 20) {
+                Badge.unlockBadge("D20");
+            }
+            if (deadlift >= 50) {
+                Badge.unlockBadge("D50");
+            }
+            if (deadlift >= 100) {
+                Badge.unlockBadge("D100");
+            }
+            if (deadlift >= 150) {
+                Badge.unlockBadge("D150");
+            }
+            if (deadlift >= 200) {
+                Badge.unlockBadge("D200");
+            }
+            if (deadlift >= 250) {
+                Badge.unlockBadge("D250");
+            }
+            if (deadlift >= 300) {
+                Badge.unlockBadge("D300");
+            }
+            if (deadlift >= 350) {
+                Badge.unlockBadge("D350");
+            }
+        } catch (NumberFormatException e) {
+            Log.e("User", "Deadlift PR is not a number" + deadliftPB);
+            return;
+        }
     }
 
     public void setSquatPB(String squatPB) {
         summary.setSquatPR(squatPB);
+        //remove the last 2 characters
+        squatPB = squatPB.substring(0, squatPB.length() - 2);
+        Long squat;
+        try {
+            squat = Long.parseLong(squatPB);
+            if (squat >= 20) {
+                Badge.unlockBadge("S20");
+            }
+            if (squat >= 50) {
+                Badge.unlockBadge("S50");
+            }
+            if (squat >= 100) {
+                Badge.unlockBadge("S100");
+            }
+            if (squat >= 150) {
+                Badge.unlockBadge("S150");
+            }
+            if (squat >= 200) {
+                Badge.unlockBadge("S200");
+            }
+            if (squat >= 250) {
+                Badge.unlockBadge("S250");
+            }
+            if (squat >= 300) {
+                Badge.unlockBadge("S300");
+            }
+        } catch (NumberFormatException e) {
+            Log.e("User", "Squat PR is not a number" + squatPB);
+            return;
+        }
+    }
+
+    public void setLongestRun(String longestRun) {
+        summary.setLongestRun(longestRun);
+        // remove the last 2 characters
+        longestRun = longestRun.substring(0, longestRun.length() - 2);
+        Long run;
+        try {
+            run = Long.parseLong(longestRun);
+            if (run >= 1) {
+                Badge.unlockBadge("R1");
+            }
+            if (run >= 1.6) {
+                Badge.unlockBadge("R1.6");
+            }
+            if (run >= 2.5) {
+                Badge.unlockBadge("R2.5");
+            }
+            if (run >= 5) {
+                Badge.unlockBadge("R5");
+            }
+            if (run >= 10) {
+                Badge.unlockBadge("R10");
+            }
+            if (run >= 21) {
+                Badge.unlockBadge("R21");
+            }
+            if (run >= 42) {
+                Badge.unlockBadge("R42");
+            }
+            if (run >= 50) {
+                Badge.unlockBadge("R50");
+            }
+            if (run >= 100) {
+                Badge.unlockBadge("R100");
+            }
+        } catch (NumberFormatException e) {
+            Log.e("User", "Longest run is not a number" + longestRun);
+            return;
+        }
     }
 
 

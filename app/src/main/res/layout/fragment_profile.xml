@@ -188,6 +188,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/profileSummaryTitle"
                 android:background="@drawable/text_border_white"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
                 android:orientation="vertical">
 
                 <!--Records 1-->
@@ -385,6 +387,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/userHistoryTitle"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
                 android:background="@drawable/text_border_white"
                 android:orientation="vertical">
 

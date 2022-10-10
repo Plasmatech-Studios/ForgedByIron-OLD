@@ -22,7 +22,7 @@ public class DataManager implements Config {
     public DataManager open() throws SQLDataException {
         dbHelper = new DatabaseHelper(context);
         database = dbHelper.getWritableDatabase();
-        //dropAllTables();
+        dropAllTables();
         createTables();
 
         //database.execSQL("DROP TABLE IF EXISTS USER;"); // TODO Remove before production);
@@ -91,7 +91,7 @@ public class DataManager implements Config {
 
     // Check to see if a username exists in the local database
     public static boolean findUsername(String username) {
-        String countQuery = "SELECT * FROM " + DatabaseHelper.USER_TABLE + " WHERE " + DatabaseHelper.USER_USERNAME + " = '" + username + "';";
+        String countQuery = "SELECT * FROM " + DatabaseHelper.USER_TABLE + " WHERE " + DatabaseHelper.USER_USERNAME + " = '" + username + "' COLLATE NOCASE;";
         Cursor cursor = database.rawQuery(countQuery, null);
         if (cursor.getCount() == 0) {
             return false;
@@ -101,7 +101,7 @@ public class DataManager implements Config {
 
     // Get the userID of a user with a given username
     public static String findUserIDFromUsername(String username) {
-        String countQuery = "SELECT userID FROM " + DatabaseHelper.USER_TABLE + " WHERE " + DatabaseHelper.USER_USERNAME + " = '" + username + "';";
+        String countQuery = "SELECT userID FROM " + DatabaseHelper.USER_TABLE + " WHERE " + DatabaseHelper.USER_USERNAME + " = '" + username + "' COLLATE NOCASE;";
         Cursor cursor = database.rawQuery(countQuery, null);
         if (cursor.getCount() == 0) {
             return null;
@@ -117,7 +117,7 @@ public class DataManager implements Config {
 
     // Get the secretKey of a user with a given username and userID
     public static String getAuthSecretKey(String username, String userID) {
-        String countQuery = "SELECT secretKey FROM " + DatabaseHelper.USER_TABLE + " WHERE " + DatabaseHelper.USER_USERNAME + " = '" + username + "' AND " + DatabaseHelper.USER_USER_ID + " = '" + userID + "';";
+        String countQuery = "SELECT secretKey FROM " + DatabaseHelper.USER_TABLE + " WHERE " + DatabaseHelper.USER_USERNAME + " = '" + username + "' COLLATE NOCASE AND " + DatabaseHelper.USER_USER_ID + " = '" + userID + "';";
         Cursor cursor = database.rawQuery(countQuery, null);
         if (cursor.getCount() == 0) {
             return null;
@@ -683,13 +683,15 @@ public class DataManager implements Config {
         cursor.moveToFirst();
         double weightTotal = 0;
         String setData = cursor.getString(8);
-        String[] sets = setData.split(";");
-        for (String set : sets) {
-            String[] setInfo = set.split(",");
-            double reps = Double.parseDouble(setInfo[0]);
-            double weight = Double.parseDouble(setInfo[1]);
-            weightTotal += reps * weight;
+        if (setData != null) {
+            String[] sets = setData.split(";");
+            for (String set : sets) {
+                String[] setInfo = set.split(",");
+                double reps = Double.parseDouble(setInfo[0]);
+                double weight = Double.parseDouble(setInfo[1]);
+                weightTotal += reps * weight;
 
+            }
         }
         return weightTotal;
 
@@ -721,6 +723,50 @@ public class DataManager implements Config {
         }
         cursor.moveToFirst();
         return cursor.getString(4);
+    }
+
+    public static void saveUserBadges(String userID) {
+        String badgeData = "";
+        for (Badge badge : Badge.getBadgeList()) {
+            if (badge.isUnlocked()) {
+                badgeData += badge.getBadgeCode() + ",";
+            }
+        }
+        if (badgeData.length() > 0) {
+            badgeData = badgeData.substring(0, badgeData.length() - 1);
+        }
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(DatabaseHelper.USER_USER_ID, userID);
+        contentValues.put(DatabaseHelper.USER_BADGES, badgeData);
+
+        try {
+            database.update(DatabaseHelper.USER_TABLE, contentValues, DatabaseHelper.USER_USER_ID + " = '" + userID + "';", null);
+        } catch (Exception e) {
+            Log.e("ERROR", "Error saving user badges");
+        }
+
+    }
+
+    public static ArrayList<String> getUserBadges(String userID) {
+        ArrayList<String> badges = new ArrayList<>();
+        String countQuery = "SELECT * FROM " + DatabaseHelper.USER_TABLE + " WHERE " + DatabaseHelper.USER_USER_ID + " = '" + userID + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() == 0) {
+            Log.d("WARNING", "No user badges found");
+            return badges;
+        }
+        cursor.moveToFirst();
+        String badgeData = cursor.getString(4);
+        // if badgeData is not null
+
+        if (badgeData != null) {
+            String[] badgeCodes = badgeData.split(",");
+            for (String badgeCode : badgeCodes) {
+                badges.add(badgeCode);
+            }
+        }
+        return badges;
     }
 
 

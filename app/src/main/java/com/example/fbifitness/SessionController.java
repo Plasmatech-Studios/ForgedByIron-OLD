@@ -14,6 +14,7 @@ public class SessionController implements Config {
     private static SecurityManager securityManager = null;
     public static User currentUser = null;
     public static ArrayList<ExerciseListView> exerciseList;
+    public static boolean isNewUser = false;
 
 
     private SessionController() {
@@ -30,21 +31,8 @@ public class SessionController implements Config {
 
     public void startSession() {
         securityManager = SecurityManager.getInstance();
-        login("admin", "password");
-        if (currentUser == null) {
-            Log.d("SessionController", "Error: Login failed");
-            try { // TODO DO NOT DEFAULT TO THIS - MOVE TO LOGIN ACTIVITY
-                Log.e("SessionController", "Error: Login failed - Creating new user");
-                securityManager.newUser("admin", "password");
-            } catch (NoSuchAlgorithmException e) {
-                Log.d("SessionController", "Error: NoSuchAlgorithmException");
-            }
-        } else {
-            Log.d("SessionController", "Logged in as " + currentUser.getUsername());
-        }
+        Badge.initBadges();
 
-
-        //change fragment to login
         MainActivity.mainActivity.replaceFragment(new LoginFragment());
     }
 
@@ -52,13 +40,17 @@ public class SessionController implements Config {
         User user;
         try {
             user = securityManager.login(username, password);
-            if (user == null) {
+            if (user == null) { // Invalid password
                 Log.e("SessionController", "Error: Login failed");
                 return;
             } else {
-                Log.i("SessionController", "Logged in as " + user.getUsername());
+                Log.e("SessionController", "Logged in as " + user.getUsername());
                 currentUser = user;
                 exerciseList = new ArrayList<ExerciseListView>();
+                Badge.loadBadges(user.getUniqueID().toString());
+                Badge.unlockBadge("B60");
+                Badge.unlockBadge("B80");
+                Badge.unlockBadge("B100");
                 if (currentUser.getActiveWorkout() != null) {
                     DataManager.fillExerciseList(currentUser.getActiveWorkout().toString());
                 }
@@ -66,6 +58,30 @@ public class SessionController implements Config {
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean processLoginRequest(String username, String password) {
+        login(username, password);
+        if (currentUser == null) { // Invalid password
+            Log.d("SessionController", "Error: Login failed");
+//            try { // TODO DO NOT DEFAULT TO THIS - MOVE TO LOGIN ACTIVITY
+//                Log.e("SessionController", "Error: Login failed - Creating new user");
+//                securityManager.newUser("admin", "password");
+//            } catch (NoSuchAlgorithmException e) {
+//                Log.d("SessionController", "Error: NoSuchAlgorithmException");
+//            }
+            return false;
+        } else {
+            Log.d("SessionController", "Logged in as " + currentUser.getUsername());
+            return true;
+        }
+    }
+
+    public void logout() {
+        currentUser = null;
+        exerciseList = null;
+        isNewUser = false;
+        MainActivity.mainActivity.replaceFragment(new LoginFragment());
     }
 
     public String getActiveUserName() {
@@ -95,7 +111,7 @@ public class SessionController implements Config {
             Log.d("SessionController", "Workout state: " + workout.getState().toString());
             workout.setName(workoutName);
             workout.startWorkout();
-            exerciseList = new ArrayList<ExerciseListView>();
+            exerciseList = new ArrayList<>();
             workout.save();
         } else {
             Log.d("SessionController", "No user logged in");

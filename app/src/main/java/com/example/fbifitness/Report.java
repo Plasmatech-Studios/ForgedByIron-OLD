@@ -94,6 +94,14 @@ public class Report implements Config {
         }
     }
 
+    public double getWorkoutWeightTotals() {
+        double total = 0;
+        for (int i = 0; i < exerciseWeightTotals.size(); i++) {
+            total += exerciseWeightTotals.get(i);
+        }
+        return total;
+    }
+
     public int getExerciseCount() {
         return exerciseIDs.size();
     }

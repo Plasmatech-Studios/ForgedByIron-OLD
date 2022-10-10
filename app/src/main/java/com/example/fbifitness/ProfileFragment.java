@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -95,7 +96,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
         tvBadges = view.findViewById(R.id.badgeTotalTextViewProfile);
         if (SessionController.currentUser != null) {
-            int badgeCount = SessionController.currentUser.getBadgeCount();
+            int badgeCount = Badge.getBadgeUnlockCount();
             tvBadges.setText(String.valueOf(badgeCount));
         } else {
             tvBadges.setText("0");
@@ -199,6 +200,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 inLongestRun = numberParser(inLongestRun, "km", 250, 1, tvQuickStat3.toString());
                 user.setLongestRun(inLongestRun);
                 tvQuickStat3.setText(inLongestRun);
+                tvBadges.setText(String.valueOf(Badge.getBadgeUnlockCount()));
             });
             builder.setNegativeButton("Cancel", (dialog, which) -> {
                 dialog.cancel();
@@ -223,6 +225,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 inBenchPB = numberParser(inBenchPB, "kg", 999, 0, tvQuickStat4.toString());
                 user.setBenchPB(inBenchPB);
                 tvQuickStat4.setText(inBenchPB);
+                tvBadges.setText(String.valueOf(Badge.getBadgeUnlockCount()));
             });
             builder.setNegativeButton("Cancel", (dialog, which) -> {
                 dialog.cancel();
@@ -247,6 +250,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 inDeadliftPB = numberParser(inDeadliftPB, "kg", 999, 0, tvQuickStat5.toString());
                 user.setDeadliftPB(inDeadliftPB);
                 tvQuickStat5.setText(inDeadliftPB);
+                tvBadges.setText(String.valueOf(Badge.getBadgeUnlockCount()));
             });
             builder.setNegativeButton("Cancel", (dialog, which) -> {
                 dialog.cancel();
@@ -271,6 +275,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 inSquatPB = numberParser(inSquatPB, "kg", 999, 0, tvQuickStat6.toString());
                 user.setSquatPB(inSquatPB);
                 tvQuickStat6.setText(inSquatPB);
+                tvBadges.setText(String.valueOf(Badge.getBadgeUnlockCount()));
             });
             builder.setNegativeButton("Cancel", (dialog, which) -> {
                 dialog.cancel();
@@ -292,6 +297,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             // Set up the buttons
             builder.setPositiveButton("Update bio", (dialog, which) -> {
                 String inBio = input.getText().toString();
+                if (inBio.length() == 0) {
+                    inBio = "No bio";
+                }
+                if (inBio.length() > 250) {
+                    inBio = inBio.substring(0, 250);
+                    Toast.makeText(view.getContext(), "Bio too long, truncated to 250 characters.", Toast.LENGTH_SHORT).show();
+                }
                 user.setBio(inBio);
                 tvBio.setText(inBio);
             });
@@ -318,6 +330,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 // Limit display name to 20 characters
                 if (inDisplayName.length() > 20) {
                     inDisplayName = inDisplayName.substring(0, 20);
+                    Toast.makeText(view.getContext(), "Display name cannot exceed 20 characters.", Toast.LENGTH_LONG).show();
+                }
+                if (inDisplayName.length() == 0) {
+                    inDisplayName = user.getUsername();
+                    Toast.makeText(view.getContext(), "Display name set to username.", Toast.LENGTH_LONG).show();
+
                 }
                 user.setDisplayName(inDisplayName);
                 tvDisplayName.setText(inDisplayName);

@@ -64,10 +64,6 @@ public class ReportsFragment extends Fragment {
         for (int i = workoutIDs.size() - 1; i >= 0; i--) {
             reports.add(new Report(workoutIDs.get(i)));
         }
-//        for (int i = 0; i < workoutIDs.size(); i++) {
-//            Report report = new Report(workoutIDs.get(i));
-//            reports.add(report);
-//        }
 
         // Create Adaptor
         ReportAdaptor reportAdaptor = new ReportAdaptor(getContext(), reports);
@@ -85,6 +81,4 @@ public class ReportsFragment extends Fragment {
         // Inflate the layout for this fragment
         return view;
     }
-
-
 }

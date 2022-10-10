@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.example.fbifitness.databinding.ActivityMainBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -30,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
     public Fragment badgeFragment = new BadgeFragment();
     public Fragment profileFragment = new ProfileFragment();
     public Fragment currentWorkoutFragment = new CurrentWorkoutFragment();
-    //public Fragment loginFragment = new LoginFragment();
+    public Fragment loginFragment = new LoginFragment();
     public Toolbar toolbar;
 
     static DataManager dbManager;
@@ -38,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
     static MainActivity mainActivity;
     static SessionController sessionController;
     static BottomNavigationView bottomNavigationView;
+
+    TextView logoutText;
 
 
     @Override
@@ -60,16 +63,6 @@ public class MainActivity extends AppCompatActivity {
         // Setup default page
         bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setSelectedItemId(R.id.profile);
-        toolbar.setNavigationIcon(R.drawable.ic_baseline_qr_code_24);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("Hi", "Dad");
-            }
-        });
-
-
-
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             Log.d("Bottom Nav", "Selected");
             if (SessionController.currentUser == null) {
@@ -113,6 +106,9 @@ public class MainActivity extends AppCompatActivity {
         sessionController = SessionController.getInstance();
         sessionController.startSession();
 
+        logoutText = findViewById(R.id.toolbar_logout);
+        logoutText.setOnClickListener(v -> sessionController.logout());
+
     }
 
     public void replaceFragment(Fragment fragment) {
@@ -133,28 +129,29 @@ public class MainActivity extends AppCompatActivity {
     }
 //
     private void setToolbarTitle(String fragmentName) {
+        TextView tileText = MainActivity.mainActivity.findViewById(R.id.toolbar_title);
         switch(fragmentName) {
             case "CommunityFragment":
-                toolbar.setTitle("Community");
+                tileText.setText("Community");
                 break;
             case "ReportsFragment":
-                toolbar.setTitle("Reports");
+                tileText.setText("Reports");
                 break;
             case "NewWorkoutFragment":
-                toolbar.setTitle("Workout");
+                tileText.setText("Workout");
                 break;
             case "BadgeFragment":
-                toolbar.setTitle("Badges");
+                tileText.setText("Badges");
                 break;
             case "ProfileFragment":
-                toolbar.setTitle("Profile");
+                tileText.setText("Profile");
                 break;
             case "CurrentWorkoutFragment":
                 Workout workout = Workout.workouts.get(SessionController.currentUser.getActiveWorkout().toString());
-                toolbar.setTitle(workout.getName());
+                tileText.setText(workout.getName());
                 break;
             default:
-                toolbar.setTitle("Fragment Title");
+                tileText.setText("Forged By Iron");
                 break;
         }
     }

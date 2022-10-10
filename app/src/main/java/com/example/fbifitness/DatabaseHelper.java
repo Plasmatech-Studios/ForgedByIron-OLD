@@ -24,6 +24,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements Config {
     static final String USER_USERNAME = "username";
     static final String USER_SECRET_KEY = "secretKey";
     static final String USER_ACTIVE_WORKOUT = "activeWorkout";
+    static final String USER_BADGES = "badges";
 
     static final String WORKOUT_TABLE = "WORKOUT";
     static final String WORKOUT_WORKOUT_ID = "workoutID";
@@ -117,6 +118,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements Config {
                 USER_USERNAME + " TEXT NOT NULL, " +
                 USER_SECRET_KEY + " TEXT NOT NULL, " +
                 USER_ACTIVE_WORKOUT + " TEXT, " +
+                USER_BADGES + " TEXT, " +
                 "FOREIGN KEY (" + USER_USERNAME + ") REFERENCES " + LOGIN_TABLE + " (" + LOGIN_USERNAME + "), " +
                 "FOREIGN KEY (" + USER_USER_ID + ") REFERENCES " + AUTH_TABLE + " (" + AUTH_USER_ID + "), " +
                 "FOREIGN KEY (" + USER_ACTIVE_WORKOUT + ") REFERENCES " + WORKOUT_TABLE + " (" + WORKOUT_WORKOUT_ID + "), " +

@@ -34,8 +34,8 @@ public class SecurityManager implements Config {
          // Try to find the user in the login table
          if (DataManager.findUsername(username) == false) { // If the user is not in the database
              Log.e("SecurityManager", "Error: Username not found in Login function" + username);
-             // TODO - Sign Up
-             return null;
+             User user = newUser(username, password);
+             return user;
          } else {
              // Get the userID from the login table
              tempID = DataManager.findUserIDFromUsername(username);
@@ -56,6 +56,7 @@ public class SecurityManager implements Config {
          User user = User.newUser(username, secretKey);
          DataManager.saveNewUser(user.getUniqueID().toString(), user.getUsername(), user.getSecretKey());
          SessionController.currentUser = user;
+         SessionController.isNewUser = true;
          return user;
      }
 //

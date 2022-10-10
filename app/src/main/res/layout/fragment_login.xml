@@ -8,8 +8,8 @@
     android:paddingLeft="@dimen/fragment_horizontal_margin"
     android:paddingTop="@dimen/fragment_vertical_margin"
     android:paddingRight="@dimen/fragment_horizontal_margin"
-    android:paddingBottom="@dimen/fragment_vertical_margin"
-    tools:context=".ui.login.LoginFragment">
+    android:paddingBottom="@dimen/fragment_vertical_margin">
+
 
     <EditText
         android:id="@+id/usernameTextBox"
@@ -42,7 +42,7 @@
         app:layout_constraintTop_toBottomOf="@+id/usernameTextBox" />
 
     <Button
-        android:id="@+id/login"
+        android:id="@+id/loginButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="start"
@@ -60,3 +60,86 @@
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+<!--    <?xml version="1.0" encoding="utf-8"?>-->
+<!--<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
+<!--xmlns:tools="http://schemas.android.com/tools"-->
+<!--android:id="@+id/container"-->
+<!--android:layout_width="match_parent"-->
+<!--android:layout_height="match_parent"-->
+<!--android:paddingLeft="@dimen/fragment_horizontal_margin"-->
+<!--android:paddingTop="@dimen/fragment_vertical_margin"-->
+<!--android:paddingRight="@dimen/fragment_horizontal_margin"-->
+<!--android:paddingBottom="@dimen/fragment_vertical_margin"-->
+<!--android:background="@color/black">-->
+
+<!--<LinearLayout-->
+<!--    android:id="@+id/linearLayoutLogo"-->
+<!--    android:layout_width="182dp"-->
+<!--    android:layout_height="160dp"-->
+<!--    app:layout_constraintTop_toTopOf="parent"-->
+<!--    app:layout_constraintStart_toStartOf="parent"-->
+<!--    app:layout_constraintEnd_toEndOf="parent"-->
+<!--    android:background="@drawable/logo"-->
+<!--    android:orientation="horizontal">-->
+
+<!--</LinearLayout>-->
+
+<!--<EditText-->
+<!--    android:id="@+id/usernameTextBox"-->
+<!--    android:layout_width="0dp"-->
+<!--    android:layout_height="wrap_content"-->
+<!--    android:layout_marginStart="24dp"-->
+<!--    android:layout_marginTop="24dp"-->
+<!--    android:layout_marginEnd="24dp"-->
+<!--    android:hint="Username"-->
+<!--    android:inputType="textEmailAddress"-->
+<!--    android:selectAllOnFocus="true"-->
+<!--    app:layout_constraintEnd_toEndOf="parent"-->
+<!--    app:layout_constraintStart_toStartOf="parent"-->
+<!--    app:layout_constraintTop_toBottomOf="@+id/linearLayoutLogo"-->
+<!--    android:textColor="@color/white"-->
+<!--    android:textColorHint="@color/white"/>-->
+
+<!--<EditText-->
+<!--    android:id="@+id/passwordTextBox"-->
+<!--    android:layout_width="0dp"-->
+<!--    android:layout_height="wrap_content"-->
+<!--    android:layout_marginStart="24dp"-->
+<!--    android:layout_marginTop="8dp"-->
+<!--    android:layout_marginEnd="24dp"-->
+<!--    android:hint="@string/prompt_password"-->
+<!--    android:imeActionLabel="@string/action_sign_in_short"-->
+<!--    android:imeOptions="actionDone"-->
+<!--    android:inputType="textPassword"-->
+<!--    android:selectAllOnFocus="true"-->
+<!--    app:layout_constraintEnd_toEndOf="parent"-->
+<!--    app:layout_constraintStart_toStartOf="parent"-->
+<!--    app:layout_constraintTop_toBottomOf="@+id/usernameTextBox"-->
+<!--    android:textColor="@color/white"-->
+<!--    android:textColorHint="@color/white"-->
+<!--    android:outlineAmbientShadowColor="@color/red"-->
+<!--    android:outlineSpotShadowColor="@color/red"-->
+<!--    android:shadowColor="@color/red"-->
+<!--    android:textColorHighlight="@color/red"/>-->
+
+<!--<Button-->
+<!--    android:id="@+id/loginButton"-->
+<!--    android:layout_width="wrap_content"-->
+<!--    android:layout_height="wrap_content"-->
+<!--    android:layout_gravity="start"-->
+<!--    android:layout_marginStart="48dp"-->
+<!--    android:layout_marginTop="0dp"-->
+<!--    android:layout_marginEnd="48dp"-->
+<!--    android:layout_marginBottom="64dp"-->
+<!--    android:enabled="false"-->
+<!--    android:text="@string/action_sign_in"-->
+<!--    app:layout_constraintBottom_toBottomOf="parent"-->
+<!--    app:layout_constraintEnd_toEndOf="parent"-->
+<!--    app:layout_constraintStart_toStartOf="parent"-->
+<!--    app:layout_constraintTop_toBottomOf="@+id/passwordTextBox"-->
+<!--    app:layout_constraintVertical_bias="0.2" />-->
+
+
+<!--</androidx.constraintlayout.widget.ConstraintLayout>-->
