@@ -51,6 +51,10 @@ public class SessionController implements Config {
                 Badge.loadBadges(user.getUniqueID().toString());
                 Badge.isLoading = false;
                 Badge.unlockBadge("FBI");
+//                Badge.unlockBadge("W1");
+//                Badge.unlockBadge("W3");
+//                Badge.unlockBadge("W5");
+
 //                Badge.unlockBadge("B60");
 //                Badge.unlockBadge("B80");
 //                Badge.unlockBadge("B100");

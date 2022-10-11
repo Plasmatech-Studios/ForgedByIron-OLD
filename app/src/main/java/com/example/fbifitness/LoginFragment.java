@@ -118,8 +118,8 @@ public class LoginFragment extends Fragment {
             if (SessionController.getInstance().processLoginRequest(username, password)) {
                 Log.d("LoginFragment", "Login successful");
                 if (SessionController.isNewUser) {
-                    MainActivity.mainActivity.replaceFragment(new BadgeFragment());
-                    MainActivity.bottomNavigationView.setSelectedItemId(R.id.badges);
+                    MainActivity.mainActivity.replaceFragment(new ProfileFragment());
+                    MainActivity.bottomNavigationView.setSelectedItemId(R.id.profile);
                     SessionController.isNewUser = false;
                     logoutText.setVisibility(View.VISIBLE);
                     //MainActivity.mainActivity.toolbar.setVisibility(View.VISIBLE);

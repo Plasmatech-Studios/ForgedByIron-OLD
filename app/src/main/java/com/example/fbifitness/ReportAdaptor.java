@@ -61,7 +61,10 @@ public class ReportAdaptor extends RecyclerView.Adapter<ReportAdaptor.MyViewHold
         chart.setHoleColor(Color.BLACK);
         chart.setTransparentCircleAlpha(0);
 
-        chart.setEntryLabelTextSize(14f);
+        chart.setEntryLabelTextSize(0f);
+        //Don't show the label
+
+        chart.getDescription().setEnabled(true);
         chart.setEntryLabelColor(Color.BLACK);
 
         chart.setCenterText(centreText); // Centre Text

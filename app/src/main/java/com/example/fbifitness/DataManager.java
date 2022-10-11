@@ -101,7 +101,11 @@ public class DataManager implements Config {
         if (cursor.getCount() > 0) {
             cursor.moveToFirst();
             byte[] imageBytes = cursor.getBlob(5);
-            return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+            if (imageBytes != null) {
+                return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+            } else {
+                return null;
+            }
         } else {
             return null;
         }

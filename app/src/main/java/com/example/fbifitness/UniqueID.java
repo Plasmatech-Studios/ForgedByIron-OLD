@@ -58,9 +58,7 @@ public class UniqueID implements Config, Saveable {
     @Override
     public void save() {
         // TODO Auto-generated method stub
-
     }
-
 }
 
 
