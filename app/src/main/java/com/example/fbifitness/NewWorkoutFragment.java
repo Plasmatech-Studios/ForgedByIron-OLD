@@ -47,45 +47,45 @@ public class NewWorkoutFragment extends Fragment {
     }
 
     private void getActiveBoxes() {
-        strengthWorkoutBox = view.findViewById(R.id.strengthWorkoutText);
-        runWalkBox = view.findViewById(R.id.runWalkText);
-        custom1Box = view.findViewById(R.id.customWorkout1Text);
-        custom2Box = view.findViewById(R.id.customWorkout2Text);
+//        strengthWorkoutBox = view.findViewById(R.id.strengthWorkoutText);
+//        runWalkBox = view.findViewById(R.id.runWalkText);
+//        custom1Box = view.findViewById(R.id.customWorkout1Text);
+//        custom2Box = view.findViewById(R.id.customWorkout2Text);
         newWorkoutBox = view.findViewById(R.id.newWorkoutText);
     }
 
     private void setTextListeners() {
-        strengthWorkoutBox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("NewWorkoutFragment", "Strength Workout Box Clicked");
-
-            }
-        });
-
-        runWalkBox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("NewWorkoutFragment", "Run/Walk Box Clicked");
-
-            }
-        });
-
-        custom1Box.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("NewWorkoutFragment", "Custom Workout 1 Box Clicked");
-
-            }
-        });
-
-        custom2Box.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("NewWorkoutFragment", "Custom Workout 2 Box Clicked");
-
-            }
-        });
+//        strengthWorkoutBox.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Log.d("NewWorkoutFragment", "Strength Workout Box Clicked");
+//
+//            }
+//        });
+//
+//        runWalkBox.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Log.d("NewWorkoutFragment", "Run/Walk Box Clicked");
+//
+//            }
+//        });
+//
+//        custom1Box.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Log.d("NewWorkoutFragment", "Custom Workout 1 Box Clicked");
+//
+//            }
+//        });
+//
+//        custom2Box.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Log.d("NewWorkoutFragment", "Custom Workout 2 Box Clicked");
+//
+//            }
+//        });
 
         newWorkoutBox.setOnClickListener(new View.OnClickListener() {
             @Override

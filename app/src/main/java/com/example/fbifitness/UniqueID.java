@@ -27,7 +27,7 @@ public class UniqueID implements Config, Saveable {
     public UniqueID(String uniqueID, IDType type) { // Constructor for loading UniqueID from database
         if (uniqueIDs.containsKey(uniqueID)) { // If the UniqueID already exists
             System.out.println("UniqueID already exists"); // Print an error
-            return; // Return the existing UniqueID
+            //return; // Return the existing UniqueID
         }
         this.uniqueID = uniqueID; // The UniqueID
         this.type = type; // The type of object this UniqueID is associated to
@@ -58,9 +58,7 @@ public class UniqueID implements Config, Saveable {
     @Override
     public void save() {
         // TODO Auto-generated method stub
-
     }
-
 }
 
 

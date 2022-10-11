@@ -13,6 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 
 
@@ -23,13 +25,17 @@ public class Workout_Adaptor extends RecyclerView.Adapter<Workout_Adaptor.MyView
     Context context;
     ArrayList<ExerciseListView> exerciseList; // Dummy data, will be replaced with workout objects
     ArrayList<Exercise_Adaptor> exercise_adaptors;
+    ArrayList<Switch> completeExerciseSwitches;
+    ArrayList<TextView> addSetButtons;
+
 
     public Workout_Adaptor(Context context, ArrayList<ExerciseListView> exerciseList, Exercise_Interface exercise_interface) {
         this.context = context;
         this.exerciseList = exerciseList;
         this.exercise_interface = exercise_interface;
         exercise_adaptors = new ArrayList<Exercise_Adaptor>();
-
+        completeExerciseSwitches = new ArrayList<Switch>();
+        addSetButtons = new ArrayList<TextView>();
     }
 
     @NonNull
@@ -46,6 +52,13 @@ public class Workout_Adaptor extends RecyclerView.Adapter<Workout_Adaptor.MyView
         setRecyclerView.setAdapter(exercise_adaptor);
         setRecyclerView.setLayoutManager(new LinearLayoutManager(context));
         exercise_adaptors.add(exercise_adaptor);
+        Workout_Adaptor adaptor = this;
+        Switch completeExerciseSwitch = view.findViewById(R.id.completeExerciseSwitch);
+        completeExerciseSwitches.add(completeExerciseSwitch);
+        completeExerciseSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            int sPosition = completeExerciseSwitches.indexOf(completeExerciseSwitch);
+            CurrentWorkoutFragment.editExerciseStatus(completeExerciseSwitch.isChecked(), adaptor, position, sPosition);
+        });
 
         return new MyViewHolder(view, exercise_interface);
     }
@@ -55,7 +68,7 @@ public class Workout_Adaptor extends RecyclerView.Adapter<Workout_Adaptor.MyView
         // Assigning values to each row in the workout_exercise_entry layout
         // Based on the position of the row
         holder.exerciseName.setText(exerciseList.get(position).getExerciseName());
-        // add sets to the recycler view
+        addSetButtons.add(holder.addSetButton);
 
     }
 
@@ -70,13 +83,15 @@ public class Workout_Adaptor extends RecyclerView.Adapter<Workout_Adaptor.MyView
         // Similar to the onCreateViewHolder method
 
         TextView exerciseName;
+        TextView addSetButton;
         RecyclerView exerciseSets;
         Switch exerciseCompleteSwitch;
-        Button addSetButton;
+        //Button addSetButton;
         public MyViewHolder(@NonNull View itemView, Exercise_Interface exercise_interface) {
             super(itemView);
 
             exerciseName = itemView.findViewById(R.id.exerciseNameText);
+            addSetButton = itemView.findViewById(R.id.AddSetText);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -84,6 +99,8 @@ public class Workout_Adaptor extends RecyclerView.Adapter<Workout_Adaptor.MyView
                         int position = getAdapterPosition();
                         if (position != RecyclerView.NO_POSITION) {
                             exercise_interface.onItemClicked(position);
+                        } else {
+                            Log.d("Workout_Adaptor", "Position is -1");
                         }
                     }
                 }});

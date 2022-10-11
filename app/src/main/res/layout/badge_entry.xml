@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" >
+
+        <!-- Wrapper -->
+        <RelativeLayout
+            android:id="@+id/badgeLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/text_border_white">
+
+
+            <!--            Title-->
+            <LinearLayout
+                android:id="@+id/badgeTitleLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/badgeTitleText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginLeft="50dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginRight="50dp"
+                        android:ems="6"
+                        android:padding="5dp"
+                        android:text="TeamFBI Member"
+                        android:textAlignment="center"
+                        android:textColor="@color/black"
+                        android:textSize="24dp"
+                        android:textStyle="bold" />
+
+                    <!-- placeholder for the badge icon-->
+                    <TextView
+                        android:id="@+id/BadgeIconText"
+                        android:layout_width="64dp"
+                        android:layout_height="56dp"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginRight="15dp"
+                        android:background="@drawable/fib_white"
+                        android:padding="5dp"
+                        android:text=""
+                        android:textAlignment="center"
+                        android:textColor="@color/white"
+                        android:textSize="20dp"
+                        android:textStyle="bold"/>
+
+                </RelativeLayout>
+            </LinearLayout>
+
+
+
+            <!--Badge Details-->
+            <LinearLayout
+                android:id="@+id/badgeDetailsLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/badgeTitleLayout"
+                android:orientation="vertical">
+
+<!--                &lt;!&ndash; Weight &ndash;&gt;-->
+<!--                <RelativeLayout-->
+<!--                    android:id="@+id/taskTitleLayout"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginLeft="50dp"-->
+<!--                    android:layout_marginTop="10dp"-->
+<!--                    android:layout_marginRight="50dp"-->
+<!--                    android:orientation="horizontal">-->
+
+<!--                    <TextView-->
+<!--                        android:id="@+id/taskText"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginRight="10dp"-->
+<!--                        android:layout_centerHorizontal="true"-->
+<!--                        android:text="Task: "-->
+<!--                        android:textAlignment="center"-->
+<!--                        android:ems="5"-->
+<!--                        android:textColor="@color/black"-->
+<!--                        android:textSize="24dp"-->
+<!--                        android:textStyle="bold" />-->
+<!--                </RelativeLayout>-->
+
+                <!-- Weight -->
+                <RelativeLayout
+                    android:id="@+id/taskTextLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="50dp"
+                    android:layout_marginRight="50dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/taskDescText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="10dp"
+                        android:layout_centerHorizontal="true"
+                        android:text="Sign in to the team FBI app"
+                        android:textAlignment="center"
+                        android:ems="20"
+                        android:textColor="@color/black"
+                        android:textSize="16dp"
+                        android:layout_marginBottom="5dp"
+                        android:textStyle="bold" />
+                </RelativeLayout>
+
+<!--                &lt;!&ndash; Weight &ndash;&gt;-->
+<!--                <RelativeLayout-->
+<!--                    android:id="@+id/descTitleLayout"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginLeft="50dp"-->
+<!--                    android:layout_marginTop="10dp"-->
+<!--                    android:layout_marginRight="50dp"-->
+<!--                    android:orientation="horizontal">-->
+
+<!--                    <TextView-->
+<!--                        android:id="@+id/descTitleText"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginRight="10dp"-->
+<!--                        android:layout_centerHorizontal="true"-->
+<!--                        android:text="Description: "-->
+<!--                        android:textAlignment="center"-->
+<!--                        android:ems="5"-->
+<!--                        android:textColor="@color/black"-->
+<!--                        android:textSize="24dp"-->
+<!--                        android:textStyle="bold" />-->
+<!--                </RelativeLayout>-->
+
+<!--                &lt;!&ndash; Weight &ndash;&gt;-->
+<!--                <RelativeLayout-->
+<!--                    android:id="@+id/descLayout"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginLeft="50dp"-->
+<!--                    android:layout_marginTop="10dp"-->
+<!--                    android:layout_marginRight="50dp"-->
+<!--                    android:orientation="horizontal">-->
+
+<!--                    <TextView-->
+<!--                        android:id="@+id/descText"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginRight="10dp"-->
+<!--                        android:layout_centerHorizontal="true"-->
+<!--                        android:text="Bench 60 kgs: "-->
+<!--                        android:textAlignment="center"-->
+<!--                        android:ems="20"-->
+<!--                        android:textColor="@color/black"-->
+<!--                        android:textSize="16dp"-->
+<!--                        android:textStyle="bold" />-->
+<!--                </RelativeLayout>-->
+
+
+
+<!--                &lt;!&ndash; Weight &ndash;&gt;-->
+<!--                <RelativeLayout-->
+<!--                    android:id="@+id/statusTitleLayout"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginLeft="50dp"-->
+<!--                    android:layout_marginTop="10dp"-->
+<!--                    android:layout_marginRight="50dp"-->
+<!--                    android:orientation="horizontal">-->
+
+<!--                    <TextView-->
+<!--                        android:id="@+id/statusTitleText"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginRight="10dp"-->
+<!--                        android:layout_centerHorizontal="true"-->
+<!--                        android:text="Status: "-->
+<!--                        android:textAlignment="center"-->
+<!--                        android:ems="5"-->
+<!--                        android:textColor="@color/black"-->
+<!--                        android:textSize="24dp"-->
+<!--                        android:textStyle="bold" />-->
+<!--                </RelativeLayout>-->
+
+<!--                &lt;!&ndash; Weight &ndash;&gt;-->
+<!--                <RelativeLayout-->
+<!--                    android:id="@+id/statusTextLayout"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginLeft="50dp"-->
+<!--                    android:layout_marginBottom="10dp"-->
+<!--                    android:layout_marginRight="50dp"-->
+<!--                    android:orientation="horizontal">-->
+
+<!--                    <TextView-->
+<!--                        android:id="@+id/statusText"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginRight="10dp"-->
+<!--                        android:layout_centerHorizontal="true"-->
+<!--                        android:text="Unlocked"-->
+<!--                        android:textAlignment="center"-->
+<!--                        android:ems="20"-->
+<!--                        android:textColor="@color/black"-->
+<!--                        android:textSize="24dp"-->
+<!--                        android:textStyle="bold" />-->
+<!--                </RelativeLayout>-->
+            </LinearLayout>
+        </RelativeLayout>
+
+
+    </androidx.cardview.widget.CardView>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

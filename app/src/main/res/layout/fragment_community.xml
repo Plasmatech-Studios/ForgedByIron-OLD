@@ -8,9 +8,10 @@
 
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/pieChartTest"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:textColor="@color/white"
         android:text="Community Fragment"
         android:textSize="26dp"

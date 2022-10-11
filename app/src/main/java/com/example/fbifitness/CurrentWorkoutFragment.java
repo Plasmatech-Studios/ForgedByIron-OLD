@@ -1,6 +1,5 @@
 package com.example.fbifitness;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
@@ -9,14 +8,18 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.SystemClock;
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
+import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.Date;
 
 
 // Controller for the recycler view in the CurrentWorkoutFragment
@@ -26,11 +29,16 @@ public class CurrentWorkoutFragment extends Fragment implements Exercise_Interfa
     private static Exercise_Adaptor adaptor;
 
     static TextView addExerciseButton;
+    static ArrayList<TextView> addSetButtons;
     static Workout_Adaptor workout_adaptor;
 
     private static String weightTime = "0";
     private static String repsDistance = "0";
     private static String prompt = "Prompt";
+    static TextView endWorkoutButton;
+
+
+
 
     public CurrentWorkoutFragment() {
         // Required empty public constructor
@@ -39,6 +47,7 @@ public class CurrentWorkoutFragment extends Fragment implements Exercise_Interfa
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
 
     }
 
@@ -52,6 +61,7 @@ public class CurrentWorkoutFragment extends Fragment implements Exercise_Interfa
         TextView textView = view.findViewById(R.id.workoutTitleText);
         Workout currentWorkout = Workout.workouts.get(SessionController.currentUser.getActiveWorkout().toString());
         textView.setText(currentWorkout.getName());
+
         RecyclerView recyclerView = view.findViewById(R.id.currentWorkoutExerciseList);
         workout_adaptor = new Workout_Adaptor(getContext(), SessionController.exerciseList, this);
         recyclerView.setAdapter(workout_adaptor);
@@ -65,7 +75,23 @@ public class CurrentWorkoutFragment extends Fragment implements Exercise_Interfa
                 addNewExercise(view);
             }
         });
+        endWorkoutButton = view.findViewById(R.id.EndWorkoutText);
+        endWorkoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) { // End Workout Button
+                Log.d("CurrentWorkoutFragment", "End Workout Button Clicked");
+                SessionController.getInstance().endWorkout();
+                //(view);
+            }
+        });
+        Chronometer mChronometer= view.findViewById(R.id.chronometer);
+        if (currentWorkout.baseTime == null){
+            currentWorkout.baseTime = SystemClock.elapsedRealtime();
+        }
+        currentWorkout.save();
+        mChronometer.setBase(currentWorkout.baseTime);
 
+        mChronometer.start();
         return view;
     }
 
@@ -241,12 +267,64 @@ public class CurrentWorkoutFragment extends Fragment implements Exercise_Interfa
         builder.show();
     }
 
+    public static void editSetStatus(boolean status, Exercise_Adaptor exercise_adaptor, int setIndex) {
+        adaptor = exercise_adaptor;
+        //hide the edit button
+        if (status) {
+            adaptor.editSetButtons.get(setIndex).setVisibility(View.GONE);
+            adaptor.weightLayout.get(setIndex).setVisibility(View.GONE);
+            adaptor.repsLayout.get(setIndex).setVisibility(View.GONE);
+            adaptor.exercise.getSets().get(setIndex).state = ActivityState.COMPLETED;
+        } else {
+            adaptor.editSetButtons.get(setIndex).setVisibility(View.VISIBLE);
+            adaptor.weightLayout.get(setIndex).setVisibility(View.VISIBLE);
+            adaptor.repsLayout.get(setIndex).setVisibility(View.VISIBLE);
+            adaptor.exercise.getSets().get(setIndex).state = ActivityState.IN_PROGRESS;
+        }
 
-    private void addNewExercise(View view) {
-        showWorkoutNameDialog(view);
+        adaptor.exercise.save();
+
+        adaptor.notifyDataSetChanged();
+
     }
 
-    private void showWorkoutNameDialog(View view) {
+    public static void editExerciseStatus(boolean status, Workout_Adaptor workout_adaptor, int setIndex, int sIndex) {
+        //hide the exercise
+        Log.d("Position", String.valueOf(setIndex));
+        Log.d("Exercise Index", String.valueOf(sIndex));
+        workout_adaptor.exercise_adaptors.get(setIndex).hideExercise(status);
+
+        if (status) {
+            workout_adaptor.addSetButtons.get(setIndex).setVisibility(View.GONE);
+            workout_adaptor.exercise_adaptors.get(setIndex).exercise.complete();
+        } else {
+            workout_adaptor.addSetButtons.get(setIndex).setVisibility(View.VISIBLE);
+            workout_adaptor.exercise_adaptors.get(setIndex).exercise.unComplete();
+        }
+
+        User user = SessionController.currentUser;
+        Workout workout = Workout.workouts.get(user.getActiveWorkout().toString());
+        // Save each exercise
+        for (Exercise exercise : Exercise.exercises.values()) {
+            if (exercise.getWorkout().equals(workout)) {
+                exercise.save();
+            }
+        }
+
+        workout_adaptor.notifyDataSetChanged();
+
+
+
+
+
+    }
+
+
+    private void addNewExercise(View view) {
+        showExerciseNameDialog(view);
+    }
+
+    private void showExerciseNameDialog(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
         builder.setTitle("Enter Exercise Name");
 
@@ -269,6 +347,7 @@ public class CurrentWorkoutFragment extends Fragment implements Exercise_Interfa
                 UniqueID exerciseID = workout.addExercise(Config.ExerciseType.WEIGHT, exerciseName);
                 Exercise exercise = Exercise.exercises.get(exerciseID.toString());
                 SessionController.exerciseList.add(new ExerciseListView(exercise));
+                exercise.save();
                 workout_adaptor.notifyItemInserted(SessionController.exerciseList.size() - 1);
 
             }
@@ -282,6 +361,7 @@ public class CurrentWorkoutFragment extends Fragment implements Exercise_Interfa
                 UniqueID exerciseID = workout.addExercise(Config.ExerciseType.TIME, exerciseName);
                 Exercise exercise = Exercise.exercises.get(exerciseID.toString());
                 SessionController.exerciseList.add(new ExerciseListView(exercise));
+                exercise.save();
                 workout_adaptor.notifyItemInserted(SessionController.exerciseList.size() - 1);
 
             }

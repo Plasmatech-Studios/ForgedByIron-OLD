@@ -7,11 +7,13 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.example.fbifitness.databinding.ActivityMainBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -30,13 +32,16 @@ public class MainActivity extends AppCompatActivity {
     public Fragment badgeFragment = new BadgeFragment();
     public Fragment profileFragment = new ProfileFragment();
     public Fragment currentWorkoutFragment = new CurrentWorkoutFragment();
-    //public Fragment loginFragment = new LoginFragment();
+    public Fragment loginFragment = new LoginFragment();
     public Toolbar toolbar;
 
     static DataManager dbManager;
     static ActivityMainBinding binding;
     static MainActivity mainActivity;
     static SessionController sessionController;
+    static BottomNavigationView bottomNavigationView;
+
+    TextView logoutText;
 
 
     @Override
@@ -56,45 +61,41 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-
-
         // Setup default page
-        BottomNavigationView bottomNavigationView;
         bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setSelectedItemId(R.id.profile);
-        replaceFragment(profileFragment); // Replace this with login screen later
-        toolbar.setTitle("Profile");
-        toolbar.setNavigationIcon(R.drawable.ic_baseline_qr_code_24);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("Hi", "Dad");
-            }
-        });
-
-
-
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
-
+            Log.d("Bottom Nav", "Selected");
+            if (SessionController.currentUser == null) {
+                Log.d("Bottom Nav", "No user");
+                return false;
+            }
             switch(item.getItemId()) {
                 case R.id.community:
-                    toolbar.setTitle("Community");
                     replaceFragment(communityFragment);
                     break;
                 case R.id.reports:
-                    toolbar.setTitle("Reports");
                     replaceFragment(reportsFragment);
                     break;
                 case R.id.newWorkout:
-                    toolbar.setTitle("Workout");
-                    replaceFragment(newWorkoutFragment);
+                    if (sessionController.currentUser != null) {
+                        if (sessionController.currentUser.getActiveWorkout() == null) {
+                            Log.e("MainActivity", "Error: No active workout");
+                            replaceFragment(newWorkoutFragment);
+                        } else {
+                            Log.e("MainActivity", "Error: Active workout already exists");
+                            replaceFragment(currentWorkoutFragment);
+                        }
+                    } else {
+                        Log.e("MainActivity", "Error: No user logged in");
+                        // TODO LOGIN
+                    }
+
                     break;
                 case R.id.badges:
-                    toolbar.setTitle("Badges");
                     replaceFragment(badgeFragment);
                     break;
                 case R.id.profile:
-                    toolbar.setTitle("Profile");
                     replaceFragment(profileFragment);
                     break;
             }
@@ -106,6 +107,9 @@ public class MainActivity extends AppCompatActivity {
         sessionController = SessionController.getInstance();
         sessionController.startSession();
 
+        logoutText = findViewById(R.id.toolbar_logout);
+        logoutText.setOnClickListener(v -> sessionController.logout());
+
     }
 
     public void replaceFragment(Fragment fragment) {
@@ -113,31 +117,42 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frame_layout, fragment);
         fragmentTransaction.commit();
+        //Log the fragment name
+        String fragmentName = getFragmentName(fragment);
+        setToolbarTitle(fragmentName);
+
     }
 
-    private String getFragmentName() {
+    private String getFragmentName(Fragment fragment) {
         // log to console
-        Log.d("Fragment Name", getSupportFragmentManager().findFragmentById(R.id.frame_layout).getClass().getSimpleName());
-        return getSupportFragmentManager().findFragmentById(R.id.frame_layout).getClass().getSimpleName();
+        Log.d("Fragment Name", fragment.getClass().getSimpleName());
+        return fragment.getClass().getSimpleName();
     }
-
-    private void setToolbarTitle() {
-        String fName = getFragmentName().toLowerCase(Locale.ROOT);
-        switch(fName) {
-            case "communityfragment":
-                toolbar.setTitle("Community");
+//
+    private void setToolbarTitle(String fragmentName) {
+        TextView tileText = MainActivity.mainActivity.findViewById(R.id.toolbar_title);
+        switch(fragmentName) {
+            case "CommunityFragment":
+                tileText.setText("Community");
                 break;
-            case "reportsfragment":
-                toolbar.setTitle("Reports");
+            case "ReportsFragment":
+                tileText.setText("Reports");
                 break;
-            case "newworkoutfragment":
-                toolbar.setTitle("Workout");
+            case "NewWorkoutFragment":
+                tileText.setText("Workout");
                 break;
-            case "badgefragment":
-                toolbar.setTitle("Badges");
+            case "BadgeFragment":
+                tileText.setText("Badges");
                 break;
-            case "profilefragment":
-                toolbar.setTitle("Profile");
+            case "ProfileFragment":
+                tileText.setText("Profile");
+                break;
+            case "CurrentWorkoutFragment":
+                Workout workout = Workout.workouts.get(SessionController.currentUser.getActiveWorkout().toString());
+                tileText.setText(workout.getName());
+                break;
+            default:
+                tileText.setText("Forged By Iron");
                 break;
         }
     }
@@ -145,6 +160,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        setToolbarTitle(); // Set toolbar title to current fragment, won't work when switching fragments as this is executed on another thread
+        //setToolbarTitle(); // Set toolbar title to current fragment, won't work when switching fragments as this is executed on another thread
     }
 }

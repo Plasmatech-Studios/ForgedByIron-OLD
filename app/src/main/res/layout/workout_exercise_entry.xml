@@ -70,7 +70,7 @@
 
             </androidx.recyclerview.widget.RecyclerView>
 
-            <!--End Workout -->
+            <!--Add Set -->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -98,6 +98,32 @@
                         android:textSize="30dp"
                         android:textStyle="bold" />
 
+                </RelativeLayout>
+            </RelativeLayout>
+
+            <!--Complete Exercise -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:layout_marginLeft="5dp"
+                android:orientation="horizontal">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Switch
+                        android:id="@+id/completeExerciseSwitch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:padding="5dp"
+                        android:textSize="20dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginBottom="16dp"
+                        android:text="Complete Exercise"
+                        android:textStyle="bold"/>
                 </RelativeLayout>
             </RelativeLayout>
 
