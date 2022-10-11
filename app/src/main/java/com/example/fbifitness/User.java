@@ -1,5 +1,6 @@
 package com.example.fbifitness;
 
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ public class User extends UniqueID implements Config, Saveable {
     private String secretKey;
     private UniqueID activeWorkout;
     private Summary summary;
+    private Bitmap profileImage = null;
 
     public static HashMap<String, User> users = new HashMap<String, User>(); // UniqueID, User
 
@@ -32,6 +34,10 @@ public class User extends UniqueID implements Config, Saveable {
             Workout workout = Workout.newWorkoutFromLoad(activeWorkout);
 
         }
+        Bitmap profileImage = DataManager.getProfileImage(uniqueID);
+        if (profileImage != null) {
+            user.setProfileImage(profileImage);
+        }
         return user;
     }
     private User(String username, String secretKey) { // Create a new user on the device
@@ -49,6 +55,7 @@ public class User extends UniqueID implements Config, Saveable {
             this.activeWorkout = new UniqueID(activeWorkout, IDType.WORKOUT);
         }
         this.summary = DataManager.getSummary(uniqueID);
+        this.profileImage = DataManager.getProfileImage(uniqueID);
     }
 
     public String getUsername() {
@@ -116,6 +123,15 @@ public class User extends UniqueID implements Config, Saveable {
             }
         }
         save();
+    }
+
+    public void setProfileImage(Bitmap profileImage) {
+        this.profileImage = profileImage;
+        save();
+    }
+
+    public Bitmap getProfileImage() {
+        return this.profileImage;
     }
 
     public int getWorkoutCount() {
@@ -201,9 +217,9 @@ public class User extends UniqueID implements Config, Saveable {
         summary.setBenchPR(benchPB);
         //remove the last 2 characters
         benchPB = benchPB.substring(0, benchPB.length() - 2);
-        Long bench;
+        Double bench;
         try {
-            bench = Long.parseLong(benchPB);
+            bench = Double.parseDouble(benchPB);
             if (bench >= 20) {
                 Badge.unlockBadge("B20");
             }
@@ -241,10 +257,10 @@ public class User extends UniqueID implements Config, Saveable {
         summary.setDeadliftPR(deadliftPB);
         //remove the last 2 characters
         deadliftPB = deadliftPB.substring(0, deadliftPB.length() - 2);
-        Long deadlift;
+        Double deadlift;
 
         try {
-            deadlift = Long.parseLong(deadliftPB);
+            deadlift = Double.parseDouble(deadliftPB);
             if (deadlift >= 20) {
                 Badge.unlockBadge("D20");
             }
@@ -279,9 +295,9 @@ public class User extends UniqueID implements Config, Saveable {
         summary.setSquatPR(squatPB);
         //remove the last 2 characters
         squatPB = squatPB.substring(0, squatPB.length() - 2);
-        Long squat;
+        Double squat;
         try {
-            squat = Long.parseLong(squatPB);
+            squat = Double.parseDouble(squatPB);
             if (squat >= 20) {
                 Badge.unlockBadge("S20");
             }
@@ -313,9 +329,11 @@ public class User extends UniqueID implements Config, Saveable {
         summary.setLongestRun(longestRun);
         // remove the last 2 characters
         longestRun = longestRun.substring(0, longestRun.length() - 2);
-        Long run;
+        Log.e("User", "Longest run is " + longestRun);
+
+        Double run;
         try {
-            run = Long.parseLong(longestRun);
+            run = Double.parseDouble(longestRun);
             if (run >= 1) {
                 Badge.unlockBadge("R1");
             }
@@ -356,9 +374,17 @@ public class User extends UniqueID implements Config, Saveable {
     @Override
     public void save() {
         if (this.activeWorkout != null) {
-            DataManager.saveUser(this.getUniqueID().toString(), this.username, this.secretKey, this.activeWorkout.toString());
+            if (this.profileImage != null) {
+                DataManager.saveUser(this.getUniqueID().toString(), this.username, this.secretKey, this.activeWorkout.toString(), this.profileImage);
+            } else {
+                DataManager.saveUser(this.getUniqueID().toString(), this.username, this.secretKey, this.activeWorkout.toString(), null);
+            }
         } else {
-            DataManager.saveUser(this.getUniqueID().toString(), this.username, this.secretKey, null);
+            if (this.profileImage != null) {
+                DataManager.saveUser(this.getUniqueID().toString(), this.username, this.secretKey, null, this.profileImage);
+            } else {
+                DataManager.saveUser(this.getUniqueID().toString(), this.username, this.secretKey, null, null);
+            }
         }
         // TODO Auto-generated method stub
 

@@ -4,8 +4,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
+import java.io.ByteArrayOutputStream;
 import java.sql.SQLDataException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,13 +25,8 @@ public class DataManager implements Config {
     public DataManager open() throws SQLDataException {
         dbHelper = new DatabaseHelper(context);
         database = dbHelper.getWritableDatabase();
-        dropAllTables();
+        dropAllTables(); // TODO REMOVE THIS BEFORE DEPLOYMENT
         createTables();
-
-        //database.execSQL("DROP TABLE IF EXISTS USER;"); // TODO Remove before production);
-        //database.execSQL(DatabaseHelper.CREATE_LOCAL_USER_TABLE_QUERY);
-
-        //database.execSQL(DatabaseHelper.CREATE_LOCAL_USER_TABLE_QUERY);
 
         return this;
 
@@ -63,7 +61,7 @@ public class DataManager implements Config {
         Log.d("WARNING", "ALL TABLES CREATED");
     }
 
-    public static void saveUser(String inUserID, String inUsername, String inSecretKey, String activeWorkoutID) {
+    public static void saveUser(String inUserID, String inUsername, String inSecretKey, String activeWorkoutID, Bitmap profileImage) {
         //Ensure a user with the same ID does not already exist using select count
         String countQuery = "SELECT * FROM " + DatabaseHelper.USER_TABLE + " WHERE " + DatabaseHelper.USER_USER_ID + " = '" + inUserID + "';";
         Cursor cursor = database.rawQuery(countQuery, null);
@@ -76,6 +74,14 @@ public class DataManager implements Config {
         } else {
             contentValues.putNull("activeWorkout");
         }
+        if (profileImage != null) {
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            profileImage.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            byte[] byteArray = stream.toByteArray();
+            contentValues.put("profileImage", byteArray);
+        } else {
+            contentValues.putNull("profileImage");
+        }
         if (cursor.getCount() > 0) {
             database.update(DatabaseHelper.USER_TABLE, contentValues, DatabaseHelper.USER_USER_ID + " = '" + inUserID + "';", null);
         } else {
@@ -84,9 +90,21 @@ public class DataManager implements Config {
     }
 
     public static void saveNewUser(String inUserID, String inUsername, String inSecretKey) {
-        saveUser(inUserID, inUsername, inSecretKey, null);
+        saveUser(inUserID, inUsername, inSecretKey, null, null);
         //insertAuth(inUserID, inSecretKey);
         //insertLogin(inUsername, inUserID);
+    }
+
+    public static Bitmap getProfileImage(String inUserID) {
+        String countQuery = "SELECT * FROM " + DatabaseHelper.USER_TABLE + " WHERE " + DatabaseHelper.USER_USER_ID + " = '" + inUserID + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            byte[] imageBytes = cursor.getBlob(5);
+            return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+        } else {
+            return null;
+        }
     }
 
     // Check to see if a username exists in the local database
@@ -425,6 +443,7 @@ public class DataManager implements Config {
         String timeStarted;
         String timeCompleted;
         String totalTime;
+        Long baseTime;
 
         if (workout.getTimeStarted() != null) {
             timeStarted = String.valueOf(workout.getTimeStarted().getTime());
@@ -443,6 +462,11 @@ public class DataManager implements Config {
         } else {
             totalTime = null;
         }
+        if (workout.baseTime != null) {
+            baseTime = workout.baseTime;
+        } else {
+            baseTime = null;
+        }
 
 
         ContentValues contentValues = new ContentValues();
@@ -452,6 +476,7 @@ public class DataManager implements Config {
         contentValues.put(DatabaseHelper.WORKOUT_TIME_STARTED, timeStarted);
         contentValues.put(DatabaseHelper.WORKOUT_TIME_COMPLETED, timeCompleted);
         contentValues.put(DatabaseHelper.WORKOUT_TOTAL_TIME, totalTime);
+        contentValues.put(DatabaseHelper.WORKOUT_BASE_TIME, baseTime);
 
         if (cursor.getCount() == 0) {
             contentValues.put(DatabaseHelper.WORKOUT_WORKOUT_ID, workoutID);
@@ -682,6 +707,9 @@ public class DataManager implements Config {
         }
         cursor.moveToFirst();
         double weightTotal = 0;
+        ExerciseType exerciseType = ExerciseType.valueOf(cursor.getString(2));
+        if (exerciseType != ExerciseType.WEIGHT) // If not weight, return 0
+            return weightTotal;
         String setData = cursor.getString(8);
         if (setData != null) {
             String[] sets = setData.split(";");
@@ -767,6 +795,17 @@ public class DataManager implements Config {
             }
         }
         return badges;
+    }
+
+    public static Long getWorkoutBaseTime(String workoutID) {
+        String countQuery = "SELECT * FROM " + DatabaseHelper.WORKOUT_TABLE + " WHERE " + DatabaseHelper.WORKOUT_WORKOUT_ID + " = '" + workoutID + "';";
+        Cursor cursor = database.rawQuery(countQuery, null);
+        if (cursor.getCount() == 0) {
+            Log.d("WARNING", "No workout base time found");
+            return null;
+        }
+        cursor.moveToFirst();
+        return cursor.getLong(7);
     }
 
 

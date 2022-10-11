@@ -6,6 +6,8 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 
 import android.se.omapi.Session;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -56,22 +58,42 @@ public class LoginFragment extends Fragment {
         passwordTextBox = view.findViewById(R.id.passwordTextBox);
         loginButton = view.findViewById(R.id.loginButton);
 
-        usernameTextBox.setOnKeyListener((viewU, i, keyEvent) -> {
-            if (usernameTextBox.getText().toString().length() > 0 && passwordTextBox.getText().toString().length() > 0) {
-                loginButton.setEnabled(true);
-            } else {
-                loginButton.setEnabled(false);
+        usernameTextBox.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
-            return false;
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (usernameTextBox.getText().toString().length() > 0 && passwordTextBox.getText().toString().length() > 0) {
+                    loginButton.setEnabled(true);
+                } else {
+                    loginButton.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
         });
 
-        passwordTextBox.setOnKeyListener((viewP, i, keyEvent) -> {
-            if (usernameTextBox.getText().toString().length() > 0 && passwordTextBox.getText().toString().length() > 0) {
-                loginButton.setEnabled(true);
-            } else {
-                loginButton.setEnabled(false);
+        passwordTextBox.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
-            return false;
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (usernameTextBox.getText().toString().length() > 0 && passwordTextBox.getText().toString().length() > 0) {
+                    loginButton.setEnabled(true);
+                } else {
+                    loginButton.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
         });
 
         loginButton.setOnClickListener(v -> {

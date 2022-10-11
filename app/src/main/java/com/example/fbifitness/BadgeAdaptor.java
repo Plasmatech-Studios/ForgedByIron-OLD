@@ -46,8 +46,8 @@ public class BadgeAdaptor extends RecyclerView.Adapter<BadgeAdaptor.MyViewHolder
         Badge badge = badges.get(position);
         holder.badgeTitle.setText(badge.getBadgeName());
         holder.badgeDesc.setText(badge.getBadgeDescription());
-        holder.badgeCode.setText(badge.getBadgeCode());
-        holder.badgeStatusText.setText(badge.isUnlocked() ? "Unlocked" : "Locked");
+        //holder.badgeCode.setText(badge.getBadgeCode());
+        //holder.badgeStatusText.setText(badge.isUnlocked() ? "Unlocked" : "Locked");
 
     }
 
@@ -60,15 +60,15 @@ public class BadgeAdaptor extends RecyclerView.Adapter<BadgeAdaptor.MyViewHolder
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
 
-        TextView badgeTitle, badgeDesc, badgeCode, badgeStatusText;
+        TextView badgeTitle, badgeDesc;// badgeCode; // badgeStatusText;
 
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             badgeTitle = itemView.findViewById(R.id.badgeTitleText);
             badgeDesc = itemView.findViewById(R.id.taskDescText);
-            badgeCode = itemView.findViewById(R.id.BadgeIconText);
-            badgeStatusText = itemView.findViewById(R.id.statusText);
+            //badgeCode = itemView.findViewById(R.id.BadgeIconText);
+            //badgeStatusText = itemView.findViewById(R.id.statusText);
 
         }
     }

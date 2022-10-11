@@ -13,10 +13,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class Exercise_Adaptor extends RecyclerView.Adapter<Exercise_Adaptor.MyViewHolder> {
     Context context;
-    ArrayList<SetListView> setList; // Dummy data, will be replaced with workout objects
+    ArrayList<SetListView> setList;
     ArrayList<TextView> editSetButtons;
     ArrayList<Switch> completeSetSwitches;
     ArrayList<LinearLayout> weightLayout;
@@ -60,12 +61,8 @@ public class Exercise_Adaptor extends RecyclerView.Adapter<Exercise_Adaptor.MyVi
 
         Switch completeSetSwitch = view.findViewById(R.id.setStatusSwitch);
         completeSetSwitches.add(completeSetSwitch);
-        completeSetSwitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int exercisePosition = parent.getChildCount();
-                CurrentWorkoutFragment.editSetStatus(completeSetSwitch.isChecked(), exercise_adaptor, setPosition); // TODO
-            }
+        completeSetSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            CurrentWorkoutFragment.editSetStatus(completeSetSwitch.isChecked(), exercise_adaptor, setPosition);
         });
 
         LinearLayout weightLayout = view.findViewById(R.id.weightLayout);
@@ -83,7 +80,20 @@ public class Exercise_Adaptor extends RecyclerView.Adapter<Exercise_Adaptor.MyVi
         // Based on the position of the row
         holder.setNumber.setText("Set " + (position + 1));
         holder.setReps.setText(setList.get(position).getSetReps());
-        holder.setWeight.setText(setList.get(position).getSetWeight() + " kg");
+        holder.setWeight.setText(setList.get(position).getSetWeight());
+        Config.ExerciseType type = exercise.getExerciseType();
+        String exerciseType = type.toString().toLowerCase(Locale.ROOT) + ":";
+        exerciseType = exerciseType.substring(0, 1).toUpperCase() + exerciseType.substring(1);
+        holder.weightText.setText(exerciseType);
+
+        if (type == Config.ExerciseType.TIME) {
+            holder.repsText.setText("Distance:");
+            holder.setReps.setText(holder.setReps.getText() + " m");
+            holder.setWeight.setText(holder.setWeight.getText() + " s");
+        } else {
+            holder.repsText.setText("Reps:");
+            holder.setWeight.setText(holder.setWeight.getText() + " kg");
+        }
     }
 
     @Override
@@ -126,6 +136,8 @@ public class Exercise_Adaptor extends RecyclerView.Adapter<Exercise_Adaptor.MyVi
         TextView setWeight;
         TextView setReps;
         TextView newSetButton;
+        TextView weightText;
+        TextView repsText;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -133,6 +145,8 @@ public class Exercise_Adaptor extends RecyclerView.Adapter<Exercise_Adaptor.MyVi
             setNumber = itemView.findViewById(R.id.setNumberText);
             setWeight = itemView.findViewById(R.id.setWeightText);
             setReps = itemView.findViewById(R.id.setRepsText);
+            weightText = itemView.findViewById(R.id.weightText);
+            repsText = itemView.findViewById(R.id.repsText);
         }
     }
 }

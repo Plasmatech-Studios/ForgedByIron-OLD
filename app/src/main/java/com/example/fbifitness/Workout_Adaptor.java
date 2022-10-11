@@ -55,13 +55,9 @@ public class Workout_Adaptor extends RecyclerView.Adapter<Workout_Adaptor.MyView
         Workout_Adaptor adaptor = this;
         Switch completeExerciseSwitch = view.findViewById(R.id.completeExerciseSwitch);
         completeExerciseSwitches.add(completeExerciseSwitch);
-        completeExerciseSwitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //get the position of the switch
-                int sPosition = completeExerciseSwitches.indexOf(completeExerciseSwitch);
-                CurrentWorkoutFragment.editExerciseStatus(completeExerciseSwitch.isChecked(), adaptor, position, sPosition);
-            }
+        completeExerciseSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            int sPosition = completeExerciseSwitches.indexOf(completeExerciseSwitch);
+            CurrentWorkoutFragment.editExerciseStatus(completeExerciseSwitch.isChecked(), adaptor, position, sPosition);
         });
 
         return new MyViewHolder(view, exercise_interface);

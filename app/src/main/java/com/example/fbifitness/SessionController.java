@@ -47,10 +47,13 @@ public class SessionController implements Config {
                 Log.e("SessionController", "Logged in as " + user.getUsername());
                 currentUser = user;
                 exerciseList = new ArrayList<ExerciseListView>();
+                Badge.initBadges();
                 Badge.loadBadges(user.getUniqueID().toString());
-                Badge.unlockBadge("B60");
-                Badge.unlockBadge("B80");
-                Badge.unlockBadge("B100");
+                Badge.isLoading = false;
+                Badge.unlockBadge("FBI");
+//                Badge.unlockBadge("B60");
+//                Badge.unlockBadge("B80");
+//                Badge.unlockBadge("B100");
                 if (currentUser.getActiveWorkout() != null) {
                     DataManager.fillExerciseList(currentUser.getActiveWorkout().toString());
                 }
@@ -81,6 +84,7 @@ public class SessionController implements Config {
         currentUser = null;
         exerciseList = null;
         isNewUser = false;
+        Badge.resetData();
         MainActivity.mainActivity.replaceFragment(new LoginFragment());
     }
 

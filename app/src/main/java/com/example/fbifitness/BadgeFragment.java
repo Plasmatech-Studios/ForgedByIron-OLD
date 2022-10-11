@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -19,6 +20,8 @@ public class BadgeFragment extends Fragment {
 
     RecyclerView recyclerView;
     ArrayList<Badge> badges;
+    TextView badgeUnlockedText;
+    TextView badgeLockedText;
 
     public BadgeFragment() {
         // Required empty public constructor
@@ -47,6 +50,12 @@ public class BadgeFragment extends Fragment {
         // Set Adaptor
         recyclerView.setAdapter(badgeAdaptor);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        badgeUnlockedText = view.findViewById(R.id.badgeUnlockedText);
+        badgeLockedText = view.findViewById(R.id.badgeLockedText);
+
+        badgeUnlockedText.setText(String.valueOf(Badge.getBadgeUnlockCount()));
+        badgeLockedText.setText(String.valueOf(Badge.getBadgeList().size() - Badge.getBadgeUnlockCount()));
 
         return view;
     }

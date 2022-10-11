@@ -87,11 +87,17 @@ public class ReportAdaptor extends RecyclerView.Adapter<ReportAdaptor.MyViewHold
         for (int i = 0; i < report.getExerciseCount(); i++) {
             try {
                 float weight = Float.valueOf(String.valueOf((report.getExerciseWeightTotal(i))));
+                if (weight == 0) {
+                    continue;
+                }
                 String exerciseName = report.getExerciseName(i);
                 entries.add(new PieEntry(weight, exerciseName));
             } catch (Exception e) {
                 Log.e("ReportAdaptor", "ERROR while adding entry in Report Adaptor -> loadPieChartData: " + e.getMessage());
             }
+        }
+        if (entries.size() == 0) {
+            entries.add(new PieEntry(1, "No Data"));
         }
 
 
@@ -108,11 +114,7 @@ public class ReportAdaptor extends RecyclerView.Adapter<ReportAdaptor.MyViewHold
 
         PieData data = new PieData(set);
         data.setDrawValues(true);
-        //add KG to end of each value
 
-
-
-        //data.setValueFormatter(new PercentFormatter(pieChart));
         data.setValueTextSize(16f);
         data.setValueTextColor(Color.BLACK);
 

@@ -1,13 +1,24 @@
 package com.example.fbifitness;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
+import android.provider.MediaStore;
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,9 +26,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -39,7 +54,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     TextView tvQuickStat5;
     TextView tvQuickStat6;
 
-    RelativeLayout profileImage;
+    ImageView profileImage;
+
+    TextView logOutButton;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -85,8 +102,35 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         tvWorkoutCount = view.findViewById(R.id.workoutTotalTextViewProfile);
         tvWorkoutCount.setText(String.valueOf(MainActivity.sessionController.getActiveUserWorkoutCount()));
         profileImage = view.findViewById(R.id.profileImage);
+        if (MainActivity.sessionController.currentUser.getProfileImage() != null) {
+            profileImage.setImageBitmap(MainActivity.sessionController.currentUser.getProfileImage());
+        }
 
-        tvFollowers = view.findViewById(R.id.followerTotalTextViewProfile);
+        ActivityResultLauncher myResult = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() == RESULT_OK) {
+                // Create a bitmap from the URI
+                Uri imageUri = result.getData().getData();
+                Bitmap bitmap = null;
+                try {
+                    bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), imageUri);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                MainActivity.sessionController.currentUser.setProfileImage(bitmap);
+                profileImage.setImageBitmap(bitmap);
+            }
+        });
+
+        profileImage.setOnClickListener(v -> {
+            // Select a new profile image from the gallery using registerForActivityResult
+            Intent intent = new Intent(Intent.ACTION_PICK);
+            intent.setType("image/*");
+            myResult.launch(intent);
+
+        });
+
+                tvFollowers = view.findViewById(R.id.followerTotalTextViewProfile);
         if (SessionController.currentUser != null) {
             int followerCount = SessionController.currentUser.getFollowersCount();
             tvFollowers.setText(String.valueOf(followerCount));
@@ -149,7 +193,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             // Set up the buttons
             builder.setPositiveButton("Update weight", (dialog, which) -> {
                 String inWeight = input.getText().toString();
-                inWeight = numberParser(inWeight, "kg", 999, 1, tvQuickStat1.toString());
+
+                inWeight = numberParser(inWeight, "kg", 999, 1, tvQuickStat1.getText().toString());
                 user.setUserWeight(inWeight);
                 tvQuickStat1.setText(inWeight);
             });
@@ -173,7 +218,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             // Set up the buttons
             builder.setPositiveButton("Update body fat", (dialog, which) -> {
                 String inBodyFat = input.getText().toString();
-                inBodyFat = numberParser(inBodyFat, "%", 100, 1, tvQuickStat2.toString());
+                inBodyFat = numberParser(inBodyFat, "%", 100, 1, tvQuickStat2.getText().toString());
                 user.setUserFat(inBodyFat);
                 tvQuickStat2.setText(inBodyFat);
             });
@@ -197,7 +242,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             // Set up the buttons
             builder.setPositiveButton("Update longest run", (dialog, which) -> {
                 String inLongestRun = input.getText().toString();
-                inLongestRun = numberParser(inLongestRun, "km", 250, 1, tvQuickStat3.toString());
+                inLongestRun = numberParser(inLongestRun, "km", 250, 1, tvQuickStat3.getText().toString());
                 user.setLongestRun(inLongestRun);
                 tvQuickStat3.setText(inLongestRun);
                 tvBadges.setText(String.valueOf(Badge.getBadgeUnlockCount()));
@@ -222,7 +267,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             // Set up the buttons
             builder.setPositiveButton("Update bench press PB", (dialog, which) -> {
                 String inBenchPB = input.getText().toString();
-                inBenchPB = numberParser(inBenchPB, "kg", 999, 0, tvQuickStat4.toString());
+                inBenchPB = numberParser(inBenchPB, "kg", 999, 0, tvQuickStat4.getText().toString());
                 user.setBenchPB(inBenchPB);
                 tvQuickStat4.setText(inBenchPB);
                 tvBadges.setText(String.valueOf(Badge.getBadgeUnlockCount()));
@@ -247,7 +292,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             // Set up the buttons
             builder.setPositiveButton("Update deadlift PB", (dialog, which) -> {
                 String inDeadliftPB = input.getText().toString();
-                inDeadliftPB = numberParser(inDeadliftPB, "kg", 999, 0, tvQuickStat5.toString());
+                inDeadliftPB = numberParser(inDeadliftPB, "kg", 999, 0, tvQuickStat5.getText().toString());
                 user.setDeadliftPB(inDeadliftPB);
                 tvQuickStat5.setText(inDeadliftPB);
                 tvBadges.setText(String.valueOf(Badge.getBadgeUnlockCount()));
@@ -272,7 +317,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             // Set up the buttons
             builder.setPositiveButton("Update squat PB", (dialog, which) -> {
                 String inSquatPB = input.getText().toString();
-                inSquatPB = numberParser(inSquatPB, "kg", 999, 0, tvQuickStat6.toString());
+                inSquatPB = numberParser(inSquatPB, "kg", 999, 0, tvQuickStat6.getText().toString());
                 user.setSquatPB(inSquatPB);
                 tvQuickStat6.setText(inSquatPB);
                 tvBadges.setText(String.valueOf(Badge.getBadgeUnlockCount()));
@@ -347,6 +392,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             builder.show();
         });
 
+        logOutButton = view.findViewById(R.id.logOutButton);
+        logOutButton.setOnClickListener(v -> {
+            SessionController.getInstance().logout();
+        });
+
 
         return  view;
     }
@@ -367,6 +417,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private String numberParser(String input, String suffix, double maxVal, int decimalPlaces, String defVal) {
         if (input.equals("")) {
             String output = defVal;
+            Log.e("numberParser", "Default value used: " + defVal);
             output = numberParser(output, suffix, maxVal, decimalPlaces, defVal);
             return output;
         }

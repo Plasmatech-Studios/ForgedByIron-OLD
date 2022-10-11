@@ -17,6 +17,7 @@ public class Workout extends UniqueID implements Config, Saveable {
     private Date timeStarted;
     private Date timeCompleted;
     private Date totalTime;
+    public Long baseTime = null;
 
     public static HashMap<String, Workout> workouts = new HashMap<String, Workout>(); // UniqueID, Workout
 
@@ -45,6 +46,7 @@ public class Workout extends UniqueID implements Config, Saveable {
             String stateString = DataManager.getWorkoutState(uniqueID);
             ActivityState state = ActivityState.valueOf(stateString);
             String timeStartedString = DataManager.getWorkoutTimeStarted(uniqueID);
+            Long baseTime = DataManager.getWorkoutBaseTime(uniqueID);
             Date timeStarted = new Date();
             if (timeStartedString != null) {
                 timeStarted = new Date(Long.parseLong(timeStartedString));
@@ -60,6 +62,7 @@ public class Workout extends UniqueID implements Config, Saveable {
                 totalTime = new Date(Long.parseLong(totalTimeString));
             }
             Workout workout = new Workout(uniqueID, userID, workoutName, state, timeStarted, timeCompleted, totalTime);
+            workout.baseTime = baseTime;
             Log.e("Workout", "Workout Name: " + workout.getName());
             workouts.put(workout.getUniqueID().toString(), workout);
             return workout;

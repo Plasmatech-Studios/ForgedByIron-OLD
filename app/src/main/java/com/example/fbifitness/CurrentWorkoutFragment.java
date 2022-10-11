@@ -85,7 +85,12 @@ public class CurrentWorkoutFragment extends Fragment implements Exercise_Interfa
             }
         });
         Chronometer mChronometer= view.findViewById(R.id.chronometer);
-        mChronometer.setBase(SystemClock.elapsedRealtime());
+        if (currentWorkout.baseTime == null){
+            currentWorkout.baseTime = SystemClock.elapsedRealtime();
+        }
+        currentWorkout.save();
+        mChronometer.setBase(currentWorkout.baseTime);
+
         mChronometer.start();
         return view;
     }

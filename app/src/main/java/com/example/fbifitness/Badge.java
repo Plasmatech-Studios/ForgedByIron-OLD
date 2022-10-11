@@ -1,6 +1,8 @@
 package com.example.fbifitness;
 
+import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,11 +11,13 @@ public class Badge implements Config {
 
     private static ArrayList<Badge> badgeList = new ArrayList<>();
     private static HashMap<String, Badge> badgeMap = new HashMap<>();
+    public static boolean isLoading = true;
 
     private String badgeName;
     private String badgeDescription;
     private boolean isUnlocked;
     private String badgeCode;
+
 
     public Badge(String badgeName, String badgeDescription, String badgeCode) {
         this.badgeName = badgeName;
@@ -28,6 +32,8 @@ public class Badge implements Config {
         if (!badgeList.isEmpty()) {
             return;
         }
+
+        new Badge("TeamFBI Competitor", "Sign in to the Forged By Iron App", "FBI");
 
         //Total Workout Badges
         new Badge("Beginner", "Complete your first workout", "W1");
@@ -200,13 +206,17 @@ public class Badge implements Config {
     }
 
     public static boolean unlockBadge(String badgeCode) {
+
         Badge badge = getBadge(badgeCode);
         if (badge != null) {
             if (!badge.isUnlocked()) {
                 badge.setUnlocked(true);
-                Log.e("Badge", "Badge Unlocked: " + badgeCode);
-                Log.e("Badge", "Badge Name: " + getBadge(badgeCode).getBadgeName());
-                Log.e("Badge", "Badge Description: " + getBadge(badgeCode).getBadgeDescription());
+                if (!isLoading) {
+                    Toast.makeText(MainActivity.mainActivity.getApplicationContext(), "Unlocked " + badge.getBadgeName(), Toast.LENGTH_SHORT).show();
+                    Log.e("Badge", "Badge Unlocked: " + badgeCode);
+                    Log.e("Badge", "Badge Name: " + getBadge(badgeCode).getBadgeName());
+                    Log.e("Badge", "Badge Description: " + getBadge(badgeCode).getBadgeDescription());
+                }
                 save();
                 return true;
             }
@@ -244,6 +254,12 @@ public class Badge implements Config {
 
     public static void save() {
         DataManager.saveUserBadges(SessionController.currentUser.getUniqueID().toString());
+    }
+
+    public static void resetData() {
+        isLoading = true;
+        badgeList = new ArrayList<>();
+        badgeMap = new HashMap<>();
     }
 
 }

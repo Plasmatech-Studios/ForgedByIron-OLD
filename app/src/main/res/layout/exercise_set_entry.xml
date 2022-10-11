@@ -91,7 +91,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginRight="10dp"
                         android:text="Weight:"
-                        android:ems="3"
+                        android:ems="4"
                         android:textColor="@color/black"
                         android:textSize="24dp"
                         android:textStyle="bold" />
@@ -126,7 +126,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginRight="10dp"
                         android:text="Reps:"
-                        android:ems="3"
+                        android:ems="4"
                         android:textColor="@color/black"
                         android:textSize="24dp"
                         android:textStyle="bold" />

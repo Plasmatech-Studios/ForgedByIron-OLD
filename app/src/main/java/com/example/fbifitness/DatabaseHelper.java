@@ -25,6 +25,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements Config {
     static final String USER_SECRET_KEY = "secretKey";
     static final String USER_ACTIVE_WORKOUT = "activeWorkout";
     static final String USER_BADGES = "badges";
+    static final String USER_PROFILE_IMAGE = "profileImage";
 
     static final String WORKOUT_TABLE = "WORKOUT";
     static final String WORKOUT_WORKOUT_ID = "workoutID";
@@ -36,6 +37,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements Config {
     static final String WORKOUT_TIME_STARTED = "timeStarted";
     static final String WORKOUT_TIME_COMPLETED = "timeCompleted";
     static final String WORKOUT_TOTAL_TIME = "totalTime";
+    static final String WORKOUT_BASE_TIME = "baseTime";
 
     static final String EXERCISE_TABLE = "EXERCISE";
     static final String EXERCISE_EXERCISE_ID = "exerciseID";
@@ -119,6 +121,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements Config {
                 USER_SECRET_KEY + " TEXT NOT NULL, " +
                 USER_ACTIVE_WORKOUT + " TEXT, " +
                 USER_BADGES + " TEXT, " +
+                USER_PROFILE_IMAGE + " BLOB, " +
                 "FOREIGN KEY (" + USER_USERNAME + ") REFERENCES " + LOGIN_TABLE + " (" + LOGIN_USERNAME + "), " +
                 "FOREIGN KEY (" + USER_USER_ID + ") REFERENCES " + AUTH_TABLE + " (" + AUTH_USER_ID + "), " +
                 "FOREIGN KEY (" + USER_ACTIVE_WORKOUT + ") REFERENCES " + WORKOUT_TABLE + " (" + WORKOUT_WORKOUT_ID + "), " +
@@ -135,6 +138,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements Config {
                 WORKOUT_TIME_STARTED + " TEXT, " +
                 WORKOUT_TIME_COMPLETED + " TEXT, " +
                 WORKOUT_TOTAL_TIME + " TEXT, " +
+                WORKOUT_BASE_TIME + " TEXT, " +
                 "FOREIGN KEY (" + WORKOUT_USER_ID + ") REFERENCES " + USER_TABLE + " (" + USER_USER_ID + "));"; // +
                 //"FOREIGN KEY (" + WORKOUT_CREATED_BY_ID + ") REFERENCES " + USER_TABLE + " (" + USER_USER_ID + "));";
 
